@@ -1,9 +1,7 @@
 <div align="center">
 
   <br />
-  <div style="display: inline-flex; align-items: center; gap: 8px;">
-    <img src="https://raw.githubusercontent.com/PKief/vscode-material-icon-theme/main/icons/code.svg" width="48" alt="MYO CS Guide Logo" />
-  </div>
+  <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/react/react-original.svg" width="64" height="64" alt="CS Guide Logo" />
   
   # 🎓 MY / YOUR / OUR CS GUIDE
   ### *Engineered for Computer Science Success & Career Preparation*
