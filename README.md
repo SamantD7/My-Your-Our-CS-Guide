@@ -1,7 +1,7 @@
 <div align="center">
 
   <br />
-  <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/react/react-original.svg" width="64" height="64" alt="CS Guide Logo" />
+  <img src="logo.svg" width="72" height="72" alt="MYO CS Guide Logo" />
   
   # 🎓 MY / YOUR / OUR CS GUIDE
   ### *Engineered for Computer Science Success & Career Preparation*
@@ -11,12 +11,12 @@
   </p>
 
   <p align="center">
-    <a href="#-curated-roadmaps">Roadmaps</a> •
-    <a href="#-key-features">Features</a> •
-    <a href="#-tech-stack">Tech Stack</a> •
-    <a href="#-system-architecture--workflow">Architecture</a> •
-    <a href="#-getting-started">Getting Started</a> •
-    <a href="#-environment-variables">Environment Setup</a>
+    <a href="#curated-roadmaps">Roadmaps</a> •
+    <a href="#key-features">Features</a> •
+    <a href="#tech-stack">Tech Stack</a> •
+    <a href="#system-architecture--workflow">Architecture</a> •
+    <a href="#getting-started">Getting Started</a> •
+    <a href="#environment-variables">Environment Setup</a>
   </p>
 
   <p align="center">
