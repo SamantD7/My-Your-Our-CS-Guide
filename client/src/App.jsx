@@ -11,6 +11,7 @@ import Signup from './pages/Signup';
 import { useAuthStore } from './store/authStore';
 import { useThemeStore } from './store/themeStore';
 import { useProgressStore } from './store/progressStore';
+import AnimatedBackground from './components/ui/AnimatedBackground';
 
 const ScrollToTop = () => {
   const { pathname } = useLocation();
@@ -38,20 +39,23 @@ function App() {
   }, [user, isSignedIn, isLoaded, setClerkState, syncGuestDataToClerk]);
 
   return (
-    <>
-      <ScrollToTop />
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/dsa" element={<DSAGuide />} />
-        <Route path="/aptitude" element={<AptitudeGuide />} />
-        <Route path="/webdev" element={<WebDevGuide />} />
-        <Route path="/ai-engineer" element={<AIEngineerGuide />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
-        <Route path="/sso-callback" element={<AuthenticateWithRedirectCallback signInForceRedirectUrl="/" signUpForceRedirectUrl="/" />} />
-        <Route path="*" element={<Home />} />
-      </Routes>
-    </>
+    <div className="relative min-h-screen bg-[var(--bg)] text-[var(--text)] transition-colors duration-300">
+      <AnimatedBackground />
+      <div className="relative z-10">
+        <ScrollToTop />
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/dsa" element={<DSAGuide />} />
+          <Route path="/aptitude" element={<AptitudeGuide />} />
+          <Route path="/webdev" element={<WebDevGuide />} />
+          <Route path="/ai-engineer" element={<AIEngineerGuide />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/sso-callback" element={<AuthenticateWithRedirectCallback signInForceRedirectUrl="/" signUpForceRedirectUrl="/" />} />
+          <Route path="*" element={<Home />} />
+        </Routes>
+      </div>
+    </div>
   );
 }
 

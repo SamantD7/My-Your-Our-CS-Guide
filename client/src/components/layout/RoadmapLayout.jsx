@@ -5,7 +5,7 @@ import Footer from './Footer';
 
 const RoadmapLayout = ({ children, sections = [], roadmapId = '', overallProgress = 0 }) => {
   return (
-    <div className="min-h-screen flex flex-col bg-[var(--bg)] text-[var(--text)] font-sans transition-colors duration-300">
+    <div className="min-h-screen flex flex-col bg-transparent text-[var(--text)] font-sans transition-colors duration-300">
       <Navbar />
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex gap-8">

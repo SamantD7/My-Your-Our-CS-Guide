@@ -50,7 +50,7 @@ const Home = () => {
   ];
 
   return (
-    <div className="min-h-screen flex flex-col bg-[var(--bg)] text-[var(--text)] transition-colors duration-300">
+    <div className="min-h-screen flex flex-col bg-transparent text-[var(--text)] transition-colors duration-300">
       <Navbar />
 
       {/* Hero Section with Animated Mesh & Blobs */}
@@ -121,13 +121,13 @@ const Home = () => {
             transition={{ duration: 0.6, delay: 0.3 }}
             className="flex flex-wrap items-center justify-center gap-4"
           >
-            <Link
-              to="/dsa"
-              className="px-6 py-3.5 rounded-xl font-syne font-bold text-sm bg-[var(--accent)] text-black hover:brightness-110 shadow-lg shadow-[var(--accent)]/20 transition-all flex items-center gap-2 group"
+            <a
+              href="#roadmaps"
+              className="px-6 py-3.5 rounded-xl font-syne font-bold text-sm bg-[var(--accent)] text-black hover:brightness-110 shadow-lg shadow-[var(--accent)]/20 transition-all flex items-center gap-2 group cursor-pointer"
             >
               <span>Explore Roadmaps</span>
               <FiArrowRight className="group-hover:translate-x-1 transition-transform" />
-            </Link>
+            </a>
             {!isAuthenticated && (
               <Link
                 to="/signup"
@@ -141,7 +141,7 @@ const Home = () => {
       </section>
 
       {/* About Section */}
-      <section className="py-16 border-y border-[var(--border)] bg-[var(--surface)]">
+      <section className="py-16 border-y border-[var(--border)] bg-[var(--surface)]/60 backdrop-blur-md">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-2xl mx-auto mb-12">
             <h2 className="text-2xl sm:text-3xl font-syne font-bold mb-3">
@@ -187,7 +187,7 @@ const Home = () => {
       </section>
 
       {/* Guide Cards Section */}
-      <section className="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section id="roadmaps" className="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 scroll-mt-20">
         <div className="text-center max-w-2xl mx-auto mb-16">
           <h2 className="text-3xl sm:text-4xl font-syne font-extrabold mb-4">
             Curated Study Guides
@@ -240,7 +240,7 @@ const Home = () => {
 
       {/* Authentication CTA Section */}
       {!isAuthenticated && (
-        <section className="py-16 border-t border-[var(--border)] bg-[var(--surface)]">
+        <section className="py-16 border-t border-[var(--border)] bg-[var(--surface)]/60 backdrop-blur-md">
           <div className="max-w-4xl mx-auto px-4 text-center">
             <h2 className="text-2xl sm:text-3xl font-syne font-bold mb-4">
               Sync Your Progress Across Devices

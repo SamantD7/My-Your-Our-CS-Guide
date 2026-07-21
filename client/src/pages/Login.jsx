@@ -150,7 +150,7 @@ const Login = () => {
   ];
 
   return (
-    <div className="min-h-screen flex flex-col bg-[var(--bg)] text-[var(--text)] transition-colors duration-300">
+    <div className="min-h-screen flex flex-col bg-transparent text-[var(--text)] transition-colors duration-300">
       <Navbar />
 
       <main className="flex-1 flex items-center justify-center p-4 py-16 animated-mesh-bg relative overflow-hidden">
