@@ -11,7 +11,7 @@
   </p>
 
   <p align="center">
-    <a href="#Curated Roadmaps">Roadmaps</a> •
+    <a href="#curated-roadmaps">Roadmaps</a> •
     <a href="#key-features">Features</a> •
     <a href="#tech-stack">Tech Stack</a> •
     <a href="#system-architecture--workflow">Architecture</a> •
