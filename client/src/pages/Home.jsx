@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { FiCode, FiCpu, FiLayers, FiBookOpen, FiArrowRight, FiCheckCircle } from 'react-icons/fi';
+import { FiCode, FiCpu, FiLayers, FiBookOpen, FiArrowRight, FiCheckCircle, FiStar, FiMessageSquare } from 'react-icons/fi';
 import Navbar from '../components/layout/Navbar';
 import Footer from '../components/layout/Footer';
 import GlassCard from '../components/ui/GlassCard';
@@ -46,6 +46,45 @@ const Home = () => {
       icon: FiCpu,
       color: 'from-emerald-400 to-teal-600',
       path: '/ai-engineer'
+    }
+  ];
+
+  const youtuberReviews = [
+    {
+      id: 'striver',
+      name: 'Striver',
+      role: 'Founder, takeUforward • A2Z DSA Sheet Creator',
+      avatar: 'S',
+      color: 'from-rose-500 to-red-600',
+      rating: 5,
+      quote: `Absolutely beautiful website. The interface is clean, the content is practical, and everything a CSE student actually needs is in one place. I genuinely didn't expect it to be this comprehensive. It's almost equivalent to my A2Z DSA Sheet... almost.\n\nIf students keep using this, they might stop asking me for roadmaps every other day.\n\nCollab?`
+    },
+    {
+      id: 'love-babbar',
+      name: 'Love Babbar',
+      role: 'Founder, CodeHelp • ex-Amazon SDE',
+      avatar: 'LB',
+      color: 'from-amber-500 to-orange-600',
+      rating: 5,
+      quote: `This is the kind of website every Computer Science student should bookmark from day one. It brings together notes, roadmaps, interview preparation, DSA resources, and much more in a very structured way. The effort behind this is clearly visible.\n\n📚 9.9/10 Study Material\n🤩 9.9/10 Website Interface\n❤️ 9.9/10 User Experience\n😊 10/10 This Review Section`
+    },
+    {
+      id: 'codewithharry',
+      name: 'CodeWithHarry',
+      role: 'Founder, CodeWithHarry • 5M+ Subscribers',
+      avatar: 'H',
+      color: 'from-indigo-500 to-purple-600',
+      rating: 5,
+      quote: `I have a complaint.\n\nThis website somehow stole all the future roadmaps I was planning to upload on my YouTube channel. 🤨\n\nSeriously... do you have access to my notebook or what?`
+    },
+    {
+      id: 'harkirat-singh',
+      name: 'Harkirat Singh',
+      role: 'Founder, 100xDevs • Full Stack & AI Cohort Lead',
+      avatar: 'HS',
+      color: 'from-emerald-400 to-teal-600',
+      rating: 5,
+      quote: `Today I'm going to cover this website.\n\nOne of the biggest mistakes self-taught developers make is trying to learn from twenty different places at once. They end up with twenty browser tabs and zero consistency.\n\nA website like this solves that problem by bringing everything together in one place—from DSA and development to interview preparation and career guidance.\n\nHonestly... after seeing this, I'm considering renaming my batch to Super 31.`
     }
   ];
 
@@ -235,6 +274,69 @@ const Home = () => {
               </GlassCard>
             );
           })}
+        </div>
+      </section>
+
+      {/* 100% Real YouTuber Reviews Section */}
+      <section className="py-20 border-t border-[var(--border)] bg-[var(--surface)]/60 backdrop-blur-md relative">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center max-w-3xl mx-auto mb-16">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full glass-panel-subtle text-xs font-mono text-[var(--accent)] mb-4 border border-[var(--border)]">
+              <FiMessageSquare className="w-3.5 h-3.5" />
+              <span>Fun Community Wall</span>
+            </div>
+            <h2 className="text-2xl sm:text-3xl font-syne font-extrabold mb-3 text-[var(--text)]">
+              100% Real Reviews from Our Long-Time Users content - 😊
+            </h2>
+            <p className="text-xs sm:text-sm font-mono text-[var(--muted)]">
+              (Definitely 100% legit feedback from top educators & creators... 😉)
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {youtuberReviews.map((rev) => (
+              <GlassCard
+                key={rev.id}
+                className="p-8 border border-[var(--border)] hover:border-[var(--accent)]/40 transition-all flex flex-col justify-between relative overflow-hidden"
+              >
+                <div className="relative z-10">
+                  {/* Header with Avatar & Name */}
+                  <div className="flex items-center gap-4 mb-5">
+                    <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${rev.color} p-0.5 shadow-md shrink-0`}>
+                      <div className="w-full h-full bg-[var(--surface)] rounded-[14px] flex items-center justify-center font-syne font-extrabold text-sm gradient-text">
+                        {rev.avatar}
+                      </div>
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <h3 className="font-syne font-bold text-lg text-[var(--text)] truncate">
+                        {rev.name}
+                      </h3>
+                      <p className="text-xs font-mono text-[var(--muted)] truncate">
+                        {rev.role}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* 5-Star Rating */}
+                  <div className="flex items-center gap-1 text-amber-400 mb-4">
+                    {[...Array(rev.rating)].map((_, i) => (
+                      <FiStar key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />
+                    ))}
+                  </div>
+
+                  {/* Quote Content */}
+                  <div className="text-xs sm:text-sm text-[var(--text)]/90 leading-relaxed font-sans whitespace-pre-line">
+                    {rev.quote}
+                  </div>
+                </div>
+              </GlassCard>
+            ))}
+          </div>
+        </div>
+
+        {/* Bottom Corner Note */}
+        <div className="absolute bottom-4 right-6 text-xs font-mono text-[var(--muted)] opacity-70 hover:opacity-100 transition-opacity italic select-none">
+          Sorry... 🙏
         </div>
       </section>
 
