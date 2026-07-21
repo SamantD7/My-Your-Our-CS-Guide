@@ -1,0 +1,1474 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Web Development — Interview Internals</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0b0f14;
+      --surface: #121924;
+      --surface-2: #0e141d;
+      --nav: #0d131b;
+      --line: #1e2733;
+      --line-soft: #171f2a;
+      --text: #e7edf3;
+      --text-dim: #8b98a8;
+      --text-faint: #5c6a7a;
+      --brand: #57c7ff;
+      --must: #ff5c5c;
+      --must-bg: rgba(255, 92, 92, 0.12);
+      --must-line: rgba(255, 92, 92, 0.35);
+      --imp: #ffb020;
+      --imp-bg: rgba(255, 176, 32, 0.12);
+      --imp-line: rgba(255, 176, 32, 0.35);
+      --good: #34d399;
+      --good-bg: rgba(52, 211, 153, 0.12);
+      --good-line: rgba(52, 211, 153, 0.35);
+      --mono: 'JetBrains Mono', ui-monospace, monospace;
+      --sans: 'Inter', system-ui, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    ::selection {
+      background: var(--brand);
+      color: #00131c;
+    }
+
+    a {
+      color: var(--brand);
+    }
+
+    ::-webkit-scrollbar {
+      width: 10px;
+      height: 10px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--bg);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #25303e;
+      border-radius: 8px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #324156;
+    }
+
+    .shell {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      width: 272px;
+      flex-shrink: 0;
+      background: var(--nav);
+      border-right: 1px solid var(--line);
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+      padding: 20px 14px 40px;
+    }
+
+    .brand-block {
+      padding: 6px 8px 18px;
+      border-bottom: 1px solid var(--line-soft);
+      margin-bottom: 16px;
+    }
+
+    .brand-path {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text-faint);
+      letter-spacing: 0.02em;
+    }
+
+    .brand-title {
+      font-family: var(--mono);
+      font-size: 15px;
+      font-weight: 600;
+      margin-top: 6px;
+      color: var(--text);
+    }
+
+    .brand-title span {
+      color: var(--brand);
+    }
+
+    .progress-block {
+      padding: 0 8px 18px;
+      border-bottom: 1px solid var(--line-soft);
+      margin-bottom: 14px;
+    }
+
+    .progress-label {
+      font-family: var(--mono);
+      font-size: 10.5px;
+      color: var(--text-faint);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+
+    .progress-bar {
+      height: 6px;
+      border-radius: 4px;
+      background: #1a2230;
+      overflow: hidden;
+      display: flex;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--brand), #7ee0ff);
+      width: 0%;
+      transition: width .3s ease;
+    }
+
+    .filter-row {
+      padding: 0 8px 18px;
+      border-bottom: 1px solid var(--line-soft);
+      margin-bottom: 14px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .filter-btn {
+      font-family: var(--mono);
+      font-size: 10.5px;
+      letter-spacing: 0.03em;
+      padding: 5px 9px;
+      border-radius: 6px;
+      border: 1px solid var(--line);
+      background: transparent;
+      color: var(--text-dim);
+      cursor: pointer;
+    }
+
+    .filter-btn.active[data-p="all"] {
+      background: #1a2230;
+      color: var(--text);
+      border-color: #2a3646;
+    }
+
+    .filter-btn.active[data-p="must"] {
+      background: var(--must-bg);
+      color: var(--must);
+      border-color: var(--must-line);
+    }
+
+    .filter-btn.active[data-p="important"] {
+      background: var(--imp-bg);
+      color: var(--imp);
+      border-color: var(--imp-line);
+    }
+
+    .filter-btn.active[data-p="good"] {
+      background: var(--good-bg);
+      color: var(--good);
+      border-color: var(--good-line);
+    }
+
+    .nav-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .nav-item a {
+      display: flex;
+      align-items: baseline;
+      gap: 9px;
+      padding: 8px 8px;
+      border-radius: 6px;
+      text-decoration: none;
+      color: var(--text-dim);
+      font-size: 13px;
+      transition: background .15s ease, color .15s ease;
+    }
+
+    .nav-item a:hover {
+      background: var(--surface);
+      color: var(--text);
+    }
+
+    .nav-item a.active-link {
+      background: var(--surface);
+      color: var(--text);
+    }
+
+    .nav-num {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text-faint);
+    }
+
+    .nav-item a.active-link .nav-num {
+      color: var(--brand);
+    }
+
+    .nav-count {
+      margin-left: auto;
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--text-faint);
+    }
+
+    .main {
+      flex: 1;
+      min-width: 0;
+      padding: 56px 56px 120px;
+      max-width: 960px;
+    }
+
+    .hero {
+      margin-bottom: 36px;
+    }
+
+    .hero-eyebrow {
+      font-family: var(--mono);
+      font-size: 12.5px;
+      color: var(--text-faint);
+      margin-bottom: 14px;
+    }
+
+    .hero-eyebrow .must {
+      color: var(--must);
+    }
+
+    .hero h1 {
+      font-family: var(--mono);
+      font-size: 36px;
+      font-weight: 700;
+      margin: 0 0 14px;
+      letter-spacing: -0.01em;
+      color: var(--text);
+    }
+
+    .hero h1 .dim {
+      color: var(--text-faint);
+    }
+
+    .hero p.sub {
+      font-size: 15.5px;
+      color: var(--text-dim);
+      max-width: 660px;
+      margin: 0 0 22px;
+    }
+
+    .legend {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      margin-bottom: 30px;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-family: var(--mono);
+      font-size: 11.5px;
+      color: var(--text-dim);
+    }
+
+    .dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .dot.must {
+      background: var(--must);
+    }
+
+    .dot.imp {
+      background: var(--imp);
+    }
+
+    .dot.good {
+      background: var(--good);
+    }
+
+    /* roadmap at a glance */
+    .glance {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--surface);
+      padding: 16px 18px;
+      margin-bottom: 44px;
+    }
+
+    .glance-label {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-faint);
+      margin-bottom: 12px;
+    }
+
+    .glance-chain {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .glance-chip {
+      font-family: var(--mono);
+      font-size: 11.5px;
+      color: var(--text-dim);
+      background: var(--surface-2);
+      border: 1px solid var(--line-soft);
+      border-radius: 6px;
+      padding: 6px 10px;
+      text-decoration: none;
+      transition: border-color .15s ease, color .15s ease;
+    }
+
+    .glance-chip:hover {
+      border-color: var(--brand);
+      color: var(--text);
+    }
+
+    .glance-chip b {
+      color: var(--brand);
+      font-weight: 600;
+      margin-right: 5px;
+    }
+
+    .glance-arrow {
+      color: var(--text-faint);
+      font-size: 12px;
+      padding: 0 1px;
+    }
+
+    .glance-note {
+      font-size: 12.5px;
+      color: var(--text-faint);
+      margin-top: 12px;
+      line-height: 1.6;
+    }
+
+    /* cross-cutting panel */
+    .crosscut {
+      border: 1px solid var(--must-line);
+      border-radius: 10px;
+      background: linear-gradient(180deg, rgba(255, 92, 92, 0.06), transparent 60%);
+      padding: 20px 22px;
+      margin-bottom: 52px;
+    }
+
+    .crosscut-head {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 6px;
+    }
+
+    .crosscut-title {
+      font-family: var(--mono);
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .crosscut-sub {
+      font-size: 13px;
+      color: var(--text-dim);
+      margin-bottom: 16px;
+      max-width: 640px;
+    }
+
+    .crosscut-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 8px;
+    }
+
+    .crosscut-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px;
+      background: var(--surface);
+      border: 1px solid var(--line-soft);
+      border-radius: 7px;
+    }
+
+    .crosscut-concept {
+      font-size: 12.5px;
+      color: var(--text);
+    }
+
+    .crosscut-depth {
+      font-family: var(--mono);
+      font-size: 9.5px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      padding: 3px 7px;
+      border-radius: 20px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .crosscut-depth.deep {
+      background: var(--must-bg);
+      color: var(--must);
+      border: 1px solid var(--must-line);
+    }
+
+    .crosscut-depth.strong {
+      background: var(--imp-bg);
+      color: var(--imp);
+      border: 1px solid var(--imp-line);
+    }
+
+    .module {
+      margin-bottom: 64px;
+      scroll-margin-top: 24px;
+    }
+
+    .module-head {
+      display: flex;
+      align-items: baseline;
+      gap: 16px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--line);
+      margin-bottom: 20px;
+    }
+
+    .module-num {
+      font-family: var(--mono);
+      font-size: 13px;
+      color: var(--brand);
+      font-weight: 600;
+    }
+
+    .module-title {
+      font-family: var(--mono);
+      font-size: 19px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .module-meter {
+      margin-left: auto;
+      display: flex;
+      height: 6px;
+      width: 120px;
+      border-radius: 4px;
+      overflow: hidden;
+      background: #1a2230;
+      flex-shrink: 0;
+    }
+
+    .meter-seg.must {
+      background: var(--must);
+    }
+
+    .meter-seg.important {
+      background: var(--imp);
+    }
+
+    .meter-seg.good {
+      background: var(--good);
+    }
+
+    .cards {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      overflow: hidden;
+      transition: border-color .15s ease;
+    }
+
+    .card[data-priority="must"] {
+      border-left: 3px solid var(--must);
+    }
+
+    .card[data-priority="important"] {
+      border-left: 3px solid var(--imp);
+    }
+
+    .card[data-priority="good"] {
+      border-left: 3px solid var(--good);
+    }
+
+    .card.hidden {
+      display: none;
+    }
+
+    .card-head {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 16px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .card-check {
+      width: 16px;
+      height: 16px;
+      border-radius: 4px;
+      border: 1.5px solid var(--line-soft);
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      background: var(--surface-2);
+    }
+
+    .card-check.done {
+      background: var(--brand);
+      border-color: var(--brand);
+    }
+
+    .card-check.done::after {
+      content: "✓";
+      font-size: 11px;
+      color: #00131c;
+      font-weight: 700;
+    }
+
+    .card-title-wrap {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .card-title {
+      font-size: 14.5px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .card-title.done {
+      color: var(--text-faint);
+      text-decoration: line-through;
+      text-decoration-color: var(--line);
+    }
+
+    .card-sub {
+      font-size: 12px;
+      color: var(--text-faint);
+      margin-top: 2px;
+    }
+
+    .badge {
+      font-family: var(--mono);
+      font-size: 9.5px;
+      letter-spacing: 0.06em;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 20px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .badge.must {
+      background: var(--must-bg);
+      color: var(--must);
+      border: 1px solid var(--must-line);
+    }
+
+    .badge.important {
+      background: var(--imp-bg);
+      color: var(--imp);
+      border: 1px solid var(--imp-line);
+    }
+
+    .badge.good {
+      background: var(--good-bg);
+      color: var(--good);
+      border: 1px solid var(--good-line);
+    }
+
+    .chevron {
+      font-size: 12px;
+      color: var(--text-faint);
+      transition: transform .18s ease;
+      flex-shrink: 0;
+    }
+
+    .card.open .chevron {
+      transform: rotate(90deg);
+    }
+
+    .card-body {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height .25s ease;
+    }
+
+    .card.open .card-body {
+      max-height: 2200px;
+    }
+
+    .card-body-inner {
+      padding: 2px 16px 18px 44px;
+      border-top: 1px solid var(--line-soft);
+      padding-top: 14px;
+    }
+
+    .cb-block {
+      margin-bottom: 14px;
+    }
+
+    .cb-block:last-child {
+      margin-bottom: 0;
+    }
+
+    .cb-label {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-faint);
+      margin-bottom: 7px;
+    }
+
+    .cb-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .cb-list li {
+      font-size: 13.5px;
+      color: var(--text-dim);
+      padding: 4px 0 4px 16px;
+      position: relative;
+      line-height: 1.5;
+    }
+
+    .cb-list.sub li::before {
+      content: "›";
+      position: absolute;
+      left: 0;
+      color: var(--text-faint);
+    }
+
+    .cb-list.understand li::before {
+      content: "—";
+      position: absolute;
+      left: 0;
+      color: var(--brand);
+    }
+
+    .cb-list.qs li {
+      color: var(--text);
+    }
+
+    .cb-list.qs li::before {
+      content: "Q";
+      position: absolute;
+      left: 0;
+      color: var(--imp);
+      font-family: var(--mono);
+      font-size: 10px;
+      top: 5px;
+    }
+
+    .cb-flow {
+      background: var(--surface-2);
+      border: 1px solid var(--line-soft);
+      border-radius: 8px;
+      padding: 12px 14px;
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--brand);
+      white-space: pre;
+      overflow-x: auto;
+      line-height: 1.6;
+    }
+
+    footer {
+      margin-top: 70px;
+      padding-top: 24px;
+      border-top: 1px solid var(--line-soft);
+      font-family: var(--mono);
+      font-size: 11.5px;
+      color: var(--text-faint);
+    }
+
+    @media (max-width: 880px) {
+      .shell {
+        flex-direction: column;
+      }
+
+      .sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+        border-right: none;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .main {
+        padding: 32px 20px 80px;
+      }
+
+      .hero h1 {
+        font-size: 26px;
+      }
+
+      .crosscut-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="shell">
+    <nav class="sidebar">
+      <div class="brand-block">
+        <div class="brand-path">~/interview-prep/</div>
+        <div class="brand-title">web<span>_</span>internals.md</div>
+      </div>
+
+      <div class="progress-block">
+        <div class="progress-label"><span>Reviewed</span><span id="progress-text">0 / 0</span></div>
+        <div class="progress-bar">
+          <div class="progress-fill" id="progress-fill"></div>
+        </div>
+      </div>
+
+      <div class="filter-row" id="filter-row">
+        <button class="filter-btn active" data-p="all">all</button>
+        <button class="filter-btn" data-p="must">must know</button>
+        <button class="filter-btn" data-p="important">important</button>
+        <button class="filter-btn" data-p="good">good to know</button>
+      </div>
+
+      <ul class="nav-list" id="nav-list"></ul>
+    </nav>
+
+    <main class="main">
+      <div class="hero">
+        <div class="hero-eyebrow">build target: <span class="must">technical interview readiness</span> · stack: MERN ·
+          v2 — merged &amp; expanded</div>
+        <h1>Web development <span class="dim">// internals</span></h1>
+        <p class="sub">You already ship MERN projects. This is the gap-filler — the internal mechanics, tradeoffs, and
+          "why" behind what you use daily, structured the way interviewers actually probe it. 65 topics, 10 phases,
+          taught deep enough to survive follow-ups.</p>
+        <div class="legend">
+          <div class="legend-item"><span class="dot must"></span>must know — high-frequency, master deeply</div>
+          <div class="legend-item"><span class="dot imp"></span>important — asked often, understand confidently</div>
+          <div class="legend-item"><span class="dot good"></span>good to know — useful context, practical level</div>
+        </div>
+      </div>
+
+      <div class="glance">
+        <div class="glance-label">the order matters — roadmap at a glance</div>
+        <div class="glance-chain" id="glance-chain"></div>
+        <div class="glance-note">Don't start with system design while HTTP, caching, databases, and networking are still
+          weak — most junior system-design knowledge is just these fundamentals combined.</div>
+      </div>
+
+      <div class="crosscut">
+        <div class="crosscut-head">
+          <span class="crosscut-title">// cross-cutting concepts</span>
+        </div>
+        <div class="crosscut-sub">These show up in multiple phases because real systems connect them — they're where
+          interviewers keep pulling on the thread with follow-ups.</div>
+        <div class="crosscut-grid" id="crosscut-grid"></div>
+      </div>
+
+      <div id="modules"></div>
+
+      <footer>10 phases · 65 topics · click a card to expand · check items off as you master them</footer>
+    </main>
+  </div>
+
+  <script>
+    const CROSSCUT = [
+      { name: "HTTP / HTTPS", depth: "deep" },
+      { name: "Request-response lifecycle", depth: "deep" },
+      { name: "Browser event loop", depth: "deep" },
+      { name: "DOM and rendering", depth: "deep" },
+      { name: "Cookies and sessions", depth: "deep" },
+      { name: "REST API design", depth: "deep" },
+      { name: "Middleware", depth: "deep" },
+      { name: "Authentication", depth: "deep" },
+      { name: "JWT", depth: "deep" },
+      { name: "CORS", depth: "deep" },
+      { name: "XSS and CSRF", depth: "deep" },
+      { name: "Database indexing", depth: "deep" },
+      { name: "Transactions and ACID", depth: "deep" },
+      { name: "Caching", depth: "deep" },
+      { name: "Redis", depth: "strong" },
+      { name: "Performance debugging", depth: "strong" },
+      { name: "Load balancing", depth: "strong" },
+      { name: "Stateless servers", depth: "strong" }
+    ];
+
+    const DATA = [
+      {
+        id: "web-works", num: "01", title: "How the web works", topics: [
+          {
+            name: "Client-server architecture", priority: "must",
+            sub: ["Client, server, database", "Request-response model", "Frontend vs backend responsibilities", "Stateless communication", "Multi-tier applications"],
+            understand: ["What happens when a frontend communicates with a backend", "Why frontend code runs on the client while backend code runs on a server", "How a typical MERN request travels through the application", "Why HTTP is considered stateless", "How the browser, API server, and database work together"],
+            qs: ["What is client-server architecture?", "What happens when React calls a backend API?", "Can a frontend directly communicate with a database?", "What does stateless mean?", "Where does backend code actually run after deployment?"]
+          },
+          {
+            name: "What happens when you enter a URL", priority: "must",
+            sub: ["URL parsing", "DNS lookup", "TCP connection", "TLS handshake", "HTTP request/response", "Browser rendering"],
+            flow: "Enter URL\n   ↓\nBrowser checks caches\n   ↓\nDNS resolves domain → IP address\n   ↓\nTCP connection established\n   ↓\nTLS handshake for HTTPS\n   ↓\nHTTP request sent\n   ↓\nServer / reverse proxy receives request\n   ↓\nApplication processes request\n   ↓\nDatabase / cache may be accessed\n   ↓\nHTTP response returned\n   ↓\nBrowser parses HTML/CSS/JS\n   ↓\nPage rendered",
+            understand: ["This single flow combines networking, browsers, HTTP, DNS, and rendering — it's one of the highest-value questions you'll get", "Be ready to say exactly where each step (DNS, TLS, rendering) happens and what triggers the next one"],
+            qs: ["What happens when you type a URL and press Enter?", "How does a domain name become an IP address?", "When does HTTPS encryption begin?", "When does the browser start rendering?", "What happens before an API request reaches your Express server?"]
+          },
+          {
+            name: "DNS, IP addresses &amp; ports", priority: "must",
+            sub: ["Domain names vs IP addresses", "DNS resolution", "DNS records: A, AAAA, CNAME", "Ports — common: 80, 443", "localhost"],
+            understand: ["Why DNS exists and how domains map to servers", "Why multiple applications can run on one machine using different ports", "Why development commonly uses ports like 3000 or 5000", "Why users normally never type :443 — it's the HTTPS default"],
+            qs: ["What is DNS?", "What's the difference between a domain and an IP address?", "What is a port?", "How can multiple servers run on one machine?", "What is localhost?"]
+          },
+          {
+            name: "TCP basics", priority: "important",
+            sub: ["TCP connection &amp; three-way handshake", "Reliable, ordered delivery", "TCP vs UDP", "Connection reuse"],
+            understand: ["Why traditional HTTP communication relies on TCP", "How TCP establishes a connection before any data flows", "Why TCP is reliable — acknowledgements and retransmission", "Keep networking depth practical — you don't need a full networks course for this level"],
+            qs: ["What is the TCP three-way handshake?", "Why does HTTP traditionally use TCP?", "TCP vs UDP?", "What happens if a packet is lost?"]
+          },
+          {
+            name: "HTTP and HTTPS", priority: "must",
+            sub: ["Request/response structure", "HTTP methods", "Status codes", "Headers", "Statelessness", "HTTPS &amp; TLS"],
+            understand: ["Methods: GET, POST, PUT, PATCH, DELETE — and what each implies about intent", "Status families: 2xx success, 3xx redirect, 4xx client error, 5xx server error (know 200/201/204, 400/401/403/404/409/429, 500/502/503 specifically)", "Headers that matter most: Content-Type, Authorization, Accept, Cache-Control, Cookie/Set-Cookie, CORS headers", "HTTPS encrypts the transport layer via TLS — headers and body are encrypted too, not just the body"],
+            qs: ["HTTP vs HTTPS?", "PUT vs PATCH?", "POST vs PUT?", "401 vs 403?", "What makes HTTP stateless?", "Are HTTP headers encrypted under HTTPS?", "Can GET requests have a body?", "Why should GET requests not modify server state?"]
+          },
+          {
+            name: "Cookies and sessions", priority: "must",
+            sub: ["Session-based authentication", "Session IDs &amp; server-side storage", "Cookie attributes", "Sessions vs JWT"],
+            flow: "Login\n   ↓\nServer creates session\n   ↓\nSession stored on server / Redis\n   ↓\nSession ID sent as cookie\n   ↓\nBrowser automatically sends cookie\n   ↓\nServer finds session using session ID",
+            understand: ["Know the cookie attributes cold: HttpOnly, Secure, SameSite, Expires/Max-Age", "Sessions are stateful (server remembers you); JWTs are stateless (the token itself proves who you are)"],
+            qs: ["What's the difference between cookies and sessions?", "Where is session data stored?", "How does the server identify a logged-in user?", "Why use HttpOnly cookies?", "Sessions vs JWT?", "What happens when a server restarts?", "How do sessions work across multiple backend servers?"]
+          },
+          {
+            name: "WebSockets", priority: "important",
+            sub: ["HTTP vs WebSocket", "Persistent, bidirectional connection", "Real-time use cases", "WebSocket handshake"],
+            understand: ["Why normal request-driven HTTP isn't ideal for every real-time use case", "How WebSockets maintain one open connection instead of repeated requests", "When to reach for WebSockets instead of polling a REST API"],
+            qs: ["HTTP vs WebSocket?", "How does a chat app receive messages instantly?", "When should WebSockets be used?", "Why not use WebSockets for every API?"]
+          },
+          {
+            name: "CDN, proxy &amp; reverse proxy", priority: "important",
+            sub: ["Forward proxy vs reverse proxy", "CDN &amp; edge caching", "Reverse proxy responsibilities"],
+            flow: "Client\n   ↓\nCDN\n   ↓\nReverse Proxy / Load Balancer\n   ↓\nBackend Server\n   ↓\nDatabase",
+            understand: ["A forward proxy sits in front of clients (hides the client from the server); a reverse proxy sits in front of servers (hides the server from the client)", "A CDN caches static assets geographically close to the user, so requests never reach your origin server at all"],
+            qs: ["Proxy vs reverse proxy?", "What does Nginx do?", "How does a CDN improve performance?", "Can a reverse proxy hide backend servers?", "CDN vs server-side caching?"]
+          }
+        ]
+      },
+
+      {
+        id: "browser", num: "02", title: "Browser fundamentals", topics: [
+          {
+            name: "DOM, CSSOM and render tree", priority: "must",
+            sub: ["HTML parsing → DOM", "CSS parsing → CSSOM", "Render tree", "Layout, paint, composite"],
+            flow: "HTML → DOM ──────┐\n                 ├→ Render Tree → Layout → Paint → Composite\nCSS  → CSSOM ────┘",
+            understand: ["The DOM is a live tree object built from HTML; the CSSOM is the same idea for CSS", "The render tree only contains visually rendered nodes — display:none elements are parsed into the DOM but excluded from it"],
+            qs: ["What is the DOM?", "DOM vs HTML?", "What is the CSSOM?", "How does the browser convert HTML into pixels?", "Why are some DOM elements absent from the render tree?"]
+          },
+          {
+            name: "Critical rendering path", priority: "must",
+            sub: ["HTML parsing", "Render-blocking CSS", "JS execution &amp; DOM construction", "Layout and paint"],
+            understand: ["CSS blocks rendering because the browser won't paint with the wrong styles — it waits for the full CSSOM", "A synchronous script blocks HTML parsing because it might use document.write or need up-to-date DOM state", "Browsers progressively render as HTML streams in, but blocking resources delay first paint"],
+            qs: ["What blocks page rendering?", "Why can JavaScript delay page loading?", "How would you improve initial page load?", "What is the critical rendering path?"]
+          },
+          {
+            name: "Reflow and repaint", priority: "important",
+            sub: ["Layout / reflow", "Repaint", "Compositing", "Expensive DOM operations"],
+            understand: ["Reflow recalculates geometry (position/size) and is expensive; repaint just redraws pixels without changing layout", "Reading layout properties (offsetHeight, getBoundingClientRect) right after writing them forces synchronous reflow — a common perf trap", "transform and opacity animate on the compositor thread, skipping layout and paint entirely"],
+            qs: ["Reflow vs repaint — which is more expensive?", "How can DOM manipulation cause performance problems?", "Why are transform and opacity often preferred for animation?"]
+          },
+          {
+            name: "The browser event loop", priority: "must",
+            sub: ["Call stack", "Web APIs", "Task/macrotask queue", "Microtask queue", "Node.js event loop phases"],
+            flow: "Call Stack\n    ↓\nSynchronous code executes\n\nAsync operation → Web API → Callback queued\n\nMicrotasks: Promise callbacks, queueMicrotask\nMacrotasks: setTimeout, setInterval, DOM events\n\nRULE:\ncurrent sync code → drain ALL microtasks → run next macrotask",
+            understand: ["JS is single-threaded — only one thing runs on the call stack at a time", "setTimeout(fn, 0) is not immediate — it still waits for the current call stack to clear and any pending microtasks to drain first", "Node's event loop has distinct phases (timers, pending callbacks, poll, check, close) — more structured than the browser's task/microtask split", "process.nextTick in Node runs even before other microtasks like Promise callbacks"],
+            qs: ["How does the JavaScript event loop work?", "What is the call stack?", "Microtask vs macrotask — name examples of each.", "Why does Promise.then() execute before setTimeout(fn, 0)?", "Is setTimeout(fn, 0) immediate?", "What happens when the call stack is blocked?", "Browser event loop vs Node.js event loop?", "Predict the output order of code mixing console.log, setTimeout, Promise.then, and async/await."]
+          },
+          {
+            name: "Browser storage", priority: "must",
+            sub: ["Cookies", "localStorage", "sessionStorage", "Basic IndexedDB awareness"],
+            understand: ["Cookies are sent automatically with every HTTP request (size cost); localStorage/sessionStorage are never sent automatically", "localStorage persists after browser restart; sessionStorage clears when the tab closes; both are readable via JS unless it's an HttpOnly cookie"],
+            qs: ["Cookies vs localStorage?", "localStorage vs sessionStorage?", "Where should authentication tokens be stored?", "Why can localStorage be risky for sensitive tokens?", "What does HttpOnly protect against?"]
+          },
+          {
+            name: "Browser caching", priority: "important",
+            sub: ["Cache-Control", "Fresh vs stale resources", "Validation &amp; ETag", "Static asset caching"],
+            understand: ["Cache-Control directives (max-age, no-cache, no-store) decide how long a response is reused before revalidating", "An ETag lets the browser ask \"has this changed?\" and get a cheap 304 instead of re-downloading"],
+            qs: ["How does browser caching work?", "What does Cache-Control do?", "What is an ETag?", "How do you ensure users receive a newly deployed JS bundle?"]
+          }
+        ]
+      },
+
+      {
+        id: "html-css", num: "03", title: "HTML &amp; CSS interview concepts", topics: [
+          {
+            name: "Semantic HTML, forms &amp; accessibility", priority: "must",
+            sub: ["Semantic elements", "Forms and labels", "Native HTML behavior", "Accessibility basics", "ARIA basics"],
+            understand: ["Why &lt;button&gt; is better than a clickable &lt;div&gt; — free keyboard access, focus, and semantics", "Semantic HTML helps both accessibility and SEO by describing structure, not just appearance", "Correct label-input relationships and when ARIA is actually needed (only when native HTML can't express it)"],
+            qs: ["What is semantic HTML?", "div vs semantic elements?", "Why use button instead of div onClick?", "What is accessibility?", "What is ARIA?", "Why is the alt attribute important?"]
+          },
+          {
+            name: "SEO and script loading", priority: "important",
+            sub: ["Title &amp; meta description", "Heading structure", "Crawlability basics", "async vs defer"],
+            understand: ["A normal script blocks HTML parsing and executes immediately at that point", "async downloads in parallel and executes as soon as it's ready — no order guarantee", "defer downloads in parallel but executes after HTML parsing finishes, in document order"],
+            qs: ["async vs defer?", "Why can scripts block HTML parsing?", "What basic factors affect SEO?", "Why is semantic HTML useful for SEO?"]
+          },
+          {
+            name: "CSS box model and sizing", priority: "must",
+            sub: ["Content, padding, border, margin", "box-sizing", "Overflow"],
+            understand: ["box-sizing: border-box makes width/height include padding and border, avoiding surprise overflow", "An element can exceed its declared width if content-box sizing is used with added padding/border"],
+            qs: ["Explain the CSS box model.", "What does box-sizing: border-box do?", "Why can an element become larger than its declared width?", "Margin vs padding?"]
+          },
+          {
+            name: "Cascade, specificity &amp; inheritance", priority: "must",
+            sub: ["Cascade", "Specificity calculation", "Source order", "Inheritance", "!important"],
+            understand: ["Specificity is calculated by (inline, IDs, classes/attributes/pseudo-classes, elements) — one ID always beats any number of classes", "When specificity ties, the later rule in source order wins", "Not every property inherits by default — layout properties generally don't, text properties often do"],
+            qs: ["How does CSS decide which rule wins?", "Specificity vs source order?", "Does every CSS property inherit?", "Why should excessive !important be avoided?"]
+          },
+          {
+            name: "Positioning, z-index &amp; stacking context", priority: "must",
+            sub: ["static / relative / absolute / fixed / sticky", "z-index", "Stacking context"],
+            understand: ["absolute positions relative to the nearest positioned (non-static) ancestor, not the viewport", "fixed is relative to the viewport; sticky toggles between relative and fixed based on scroll position", "z-index only competes within the same stacking context — transform, opacity &lt; 1, and a few other properties create a new one"],
+            qs: ["absolute is positioned relative to what?", "fixed vs sticky?", "Why does a large z-index sometimes not work?", "What creates a stacking context?"]
+          },
+          {
+            name: "Flexbox, Grid &amp; responsive design", priority: "must",
+            sub: ["Flexbox main/cross axis &amp; alignment", "Flex-grow/shrink", "CSS Grid basics", "Media queries", "Mobile-first design"],
+            understand: ["Flexbox is one-dimensional; Grid is two-dimensional — reach for Grid when rows and columns both matter", "flex: 1 is shorthand for flex-grow:1, flex-shrink:1, flex-basis:0% — items grow/shrink equally from zero", "Mobile-first means base styles target the smallest screen, then min-width queries add complexity upward"],
+            qs: ["Flexbox vs Grid?", "justify-content vs align-items?", "What does flex: 1 mean?", "Mobile-first vs desktop-first?", "How would you build a responsive layout?"]
+          },
+          {
+            name: "CSS units and animations", priority: "important",
+            sub: ["px, %, em, rem", "vh / vw", "Transitions", "Keyframe animations", "transform"],
+            understand: ["em compounds through nested parents; rem is always relative to the root, which makes it more predictable", "Animation gives more control (keyframes, iteration, direction); transition is simpler, state-to-state only", "transform and opacity are animation-friendly because they skip layout and paint"],
+            qs: ["em vs rem?", "When should you use %, rem, or viewport units?", "Transition vs animation?", "Why is transform generally animation-friendly?"]
+          }
+        ]
+      },
+
+      {
+        id: "api-backend", num: "04", title: "API &amp; backend engineering", topics: [
+          {
+            name: "REST and RESTful API design", priority: "must",
+            sub: ["Resources &amp; resource-oriented URLs", "HTTP methods", "Statelessness", "Consistent design"],
+            understand: ["Good REST design: GET /users, GET /users/:id, POST /users, PATCH /users/:id, DELETE /users/:id — nouns, not verbs like /getUsers", "URLs should describe resources; the HTTP method describes the action on them"],
+            qs: ["What is REST?", "What makes an API RESTful?", "REST vs HTTP?", "Why should URLs generally use nouns?", "How would you design an API for users and posts?"]
+          },
+          {
+            name: "HTTP semantics and idempotency", priority: "must",
+            sub: ["Safe methods", "Idempotent methods", "PUT vs PATCH", "Retry behavior"],
+            understand: ["Idempotent means repeating the same operation produces the same end state — call it once or ten times, nothing changes further", "GET, PUT, DELETE are idempotent; POST is not — this is exactly why payment APIs are careful about which method they retry"],
+            qs: ["What is idempotency?", "Is GET idempotent? Is DELETE idempotent? Is POST idempotent?", "Why does idempotency matter in distributed systems and payment APIs?"]
+          },
+          {
+            name: "Pagination, filtering &amp; sorting", priority: "important",
+            sub: ["Query parameters", "Offset pagination", "Cursor pagination basics", "Filtering &amp; sorting"],
+            understand: ["Cursor pagination avoids the \"shifting page\" problem offset pagination has when rows are inserted/deleted mid-scroll", "Very large offsets get slow because the DB still has to scan and discard all the skipped rows"],
+            qs: ["Why should large API responses be paginated?", "Offset vs cursor pagination?", "How would you design filtering and sorting?", "What problems occur with very large offsets?"]
+          },
+          {
+            name: "Middleware and the request pipeline", priority: "must",
+            sub: ["Middleware concept", "Execution order", "Auth, validation &amp; logging middleware", "Error middleware"],
+            flow: "Request\n   ↓\nLogging\n   ↓\nRate Limiting\n   ↓\nAuthentication\n   ↓\nValidation\n   ↓\nController\n   ↓\nService / Database\n   ↓\nResponse",
+            understand: ["Middleware runs strictly in registration order — one classic bug is registering error handlers before the routes they should catch", "next() passes control to the next middleware; next(err) skips straight to error-handling middleware", "If middleware never calls next() or sends a response, the request just hangs forever"],
+            qs: ["What is middleware?", "How does Express middleware work?", "What does next() do?", "Why does middleware order matter?", "What happens if middleware never calls next() or sends a response?"]
+          },
+          {
+            name: "Validation and error handling", priority: "must",
+            sub: ["Client vs server-side validation", "Schema validation", "Centralized error handling", "Operational vs programming errors"],
+            understand: ["Client-side validation is UX; server-side validation is security — never trust the frontend already did it", "A centralized error handler gives every endpoint the same response shape, instead of ad-hoc try/catch everywhere", "Stack traces should never be sent to the client in production — log them, return a safe message instead"],
+            qs: ["Why validate on the backend if the frontend already validates?", "How do you handle errors globally in Express?", "Should internal stack traces be returned to users?", "How would you structure API error responses?"]
+          },
+          {
+            name: "API versioning and rate limiting", priority: "important",
+            sub: ["API versioning strategies", "Breaking changes", "Rate limiting strategies", "429 Too Many Requests"],
+            understand: ["Versioning (URI like /v1/, or a header) lets you ship breaking changes without breaking existing clients", "Rate limiting protects against abuse and brute-force by capping requests per client in a time window"],
+            qs: ["Why version an API?", "How can API versioning be implemented?", "Why is rate limiting needed?", "How would you rate-limit a login endpoint?"]
+          }
+        ]
+      },
+
+      {
+        id: "database", num: "05", title: "Database concepts", topics: [
+          {
+            name: "SQL vs NoSQL", priority: "must",
+            sub: ["Relational vs document databases", "Structured vs flexible schemas", "Relationships", "Transactions &amp; scaling"],
+            understand: ["This isn't \"SQL is structured, NoSQL is unstructured\" — it's a real tradeoff between enforced schema/relations and flexible, evolving documents", "NoSQL isn't automatically faster; it's a different consistency/flexibility tradeoff, and MongoDB does support multi-document transactions"],
+            qs: ["SQL vs NoSQL?", "MongoDB vs PostgreSQL/MySQL?", "When would you choose SQL over MongoDB?", "Is NoSQL always faster?", "Can MongoDB support transactions?"]
+          },
+          {
+            name: "Schema design and relationships", priority: "must",
+            sub: ["One-to-one, one-to-many, many-to-many", "Embedding vs referencing", "Data access patterns"],
+            understand: ["In MongoDB, embed data that's read together and rarely changes independently; reference data that's large, shared, or updated often", "Embedding becomes a bad choice when the embedded array can grow unbounded or needs to be queried independently", "Schema design should follow how the data is actually queried, not just how it's conceptually related"],
+            qs: ["How would you model users and posts?", "Embedding vs referencing in MongoDB?", "When does embedding become a bad choice?", "How do query patterns influence schema design?"]
+          },
+          {
+            name: "Normalization and denormalization", priority: "important",
+            sub: ["Data duplication", "Update anomalies", "Normalization purpose", "Denormalization tradeoffs"],
+            understand: ["Normalization removes duplication so an update only has to happen in one place — but costs more joins", "Denormalization trades that duplication back in for fewer joins and faster reads, which is why it's common in NoSQL"],
+            qs: ["What is normalization?", "Why denormalize data?", "What are the tradeoffs?", "Why is denormalization common in NoSQL systems?"]
+          },
+          {
+            name: "Indexing", priority: "must",
+            sub: ["What an index is", "B-tree concept", "Single vs compound indexes", "Index selectivity", "Read vs write tradeoff"],
+            understand: ["An index is a separate sorted structure pointing back to rows/documents — it costs extra storage and slower writes to maintain", "Indexing a low-selectivity field (like a boolean) gives little benefit because it barely narrows the search", "In a compound index, field order matters — the index is only usable left-to-right for range/sort operations"],
+            qs: ["How does an index improve query performance?", "Why not index every field?", "What happens internally without an index?", "Single vs compound index — does order matter?", "Why can an index sometimes not be used?"]
+          },
+          {
+            name: "Transactions and ACID", priority: "must",
+            sub: ["Atomicity, Consistency, Isolation, Durability", "Commit and rollback", "Multi-document transactions in MongoDB"],
+            understand: ["ACID is what lets you trust an operation like a bank transfer won't leave data half-updated if something fails midway", "If one operation in a transaction fails, the whole transaction rolls back — nothing partially commits"],
+            qs: ["What are ACID properties?", "Why are transactions needed? Give a bank-transfer example.", "What happens if one operation fails halfway?", "Can MongoDB perform transactions?"]
+          },
+          {
+            name: "Query optimization", priority: "important",
+            sub: ["Avoiding unnecessary data fetching", "Query plans", "N+1 query problem", "Pagination"],
+            understand: ["The N+1 problem: fetching a list, then querying per-item in a loop instead of one batched query", "Fetching whole documents/rows when only a few fields are needed wastes bandwidth and memory for no reason"],
+            qs: ["How would you debug a slow database query?", "Why can fetching unnecessary fields hurt performance?", "What is the N+1 query problem?", "How do indexes help?"]
+          },
+          {
+            name: "Replication and sharding", priority: "important",
+            sub: ["Primary and replicas", "Read scaling &amp; availability", "Sharding — horizontal partitioning"],
+            understand: ["Replication copies the same data to multiple nodes for read scale and failover; storage cost goes up, not down", "Sharding splits different data across nodes for write/storage scale — keep this conceptual, deep distributed internals aren't needed here"],
+            qs: ["Replication vs sharding?", "Does replication increase storage?", "What happens if the primary database fails?", "Why would a database need sharding?"]
+          }
+        ]
+      },
+
+      {
+        id: "security", num: "06", title: "Authentication &amp; web security", topics: [
+          {
+            name: "Authentication vs authorization", priority: "must",
+            sub: ["Identity verification vs permissions", "Roles", "Auth middleware", "Authorization checks"],
+            understand: ["Authentication always runs first (who are you), authorization runs second (what are you allowed to do)", "Authorization must be enforced on the backend — a hidden frontend button is not access control"],
+            qs: ["Authentication vs authorization?", "Should authorization be checked only on the frontend?", "How would you implement admin-only routes?", "Authentication succeeds but authorization fails — what status code should be returned?"]
+          },
+          {
+            name: "JWT authentication", priority: "must",
+            sub: ["Header.payload.signature", "Signing vs encryption", "Access vs refresh tokens", "Token storage &amp; revocation", "JWT vs sessions"],
+            flow: "Login\n   ↓\nVerify credentials\n   ↓\nIssue short-lived access token\n   + longer-lived refresh token\n   ↓\nAccess token expires\n   ↓\nRefresh token obtains new access token",
+            understand: ["A JWT is signed, not encrypted by default — the payload is just base64, readable by anyone, never put secrets in it", "The signature is what stops forgery: it's computed from the header+payload with a server-only secret, so a modified payload won't match", "JWTs are stateless — there's no built-in revocation. Early logout/revocation needs a blocklist or deliberately short expiry", "If a refresh token is stolen, the attacker can keep minting new access tokens until it's revoked or expires — treat it like a credential"],
+            qs: ["How does JWT authentication work?", "Can users read JWT payloads?", "If users can modify a JWT payload, what prevents forgery?", "Access token vs refresh token?", "Where should tokens be stored?", "How does logout work with JWT?", "How can a JWT be revoked before expiration?", "JWT vs sessions?", "What happens if a refresh token is stolen?"]
+          },
+          {
+            name: "Password security", priority: "must",
+            sub: ["Hashing vs encryption", "Salting", "bcrypt / Argon2", "Brute-force protection"],
+            understand: ["Passwords are hashed (one-way, never recoverable), not encrypted (reversible) — you should never be able to \"decrypt\" a password", "A salt makes identical passwords hash differently, defeating precomputed rainbow tables", "bcrypt/Argon2 are deliberately slow and tunable-cost, which makes brute-forcing computationally expensive on purpose"],
+            qs: ["Why should passwords not be encrypted and stored?", "Hashing vs encryption?", "What is a salt?", "Why use bcrypt/Argon2 rather than a fast general-purpose hash?", "Can a hashed password be decrypted?"]
+          },
+          {
+            name: "CORS", priority: "must",
+            sub: ["Same-origin policy", "Origin", "CORS headers", "Simple vs preflight requests", "Credentials"],
+            understand: ["CORS is a browser-enforced mechanism protecting users, not a server security feature protecting the API itself", "That's exactly why an API can work fine in Postman (no browser, no CORS check) but fail in a browser app", "A preflight OPTIONS request checks permission before certain \"non-simple\" requests (custom headers, non-GET/POST, etc.) are actually sent"],
+            qs: ["What is CORS?", "Why does an API work in Postman but fail in the browser?", "What is a preflight request?", "What is an origin?", "Does CORS protect an API from direct requests by attackers?"]
+          },
+          {
+            name: "XSS", priority: "must",
+            sub: ["Stored, reflected &amp; DOM-based XSS", "Output escaping", "Sanitization", "CSP basics"],
+            understand: ["XSS injects attacker-controlled script that runs in the victim's browser with the victim's session/cookies", "React escapes text content by default, reducing some risk — but dangerouslySetInnerHTML, raw URLs, and third-party scripts can still introduce XSS", "Storing tokens in localStorage raises the stakes of any XSS bug, since JS-readable storage becomes directly stealable"],
+            qs: ["What is XSS?", "How does XSS happen?", "Why can storing tokens in localStorage increase the impact of XSS?", "How does React reduce some XSS risk?", "Can React apps still have XSS vulnerabilities?"]
+          },
+          {
+            name: "CSRF", priority: "must",
+            sub: ["Automatic cookie sending", "Cross-site requests", "SameSite cookies", "CSRF tokens"],
+            understand: ["CSRF exploits the fact that cookies are sent automatically — a malicious site can trigger a request to your API using the victim's own cookies", "It's specifically a cookie-based-auth problem; token-in-header auth (like JWT sent via Authorization header) isn't automatically attached cross-site", "SameSite=Strict/Lax stops the browser from sending cookies on most cross-site requests, neutralizing classic CSRF"],
+            qs: ["What is CSRF?", "Why are cookie-based authentication systems relevant to CSRF?", "XSS vs CSRF?", "How does SameSite help?"]
+          },
+          {
+            name: "Injection attacks", priority: "must",
+            sub: ["SQL injection", "NoSQL injection", "Parameterized queries", "Input validation"],
+            understand: ["Injection happens when untrusted input is concatenated straight into a query instead of being treated as data", "NoSQL injection is real too — unvalidated input can smuggle in operators like $gt or $where and change query logic", "Parameterized queries separate the query structure from the data, so injected input can never be interpreted as code"],
+            qs: ["How does SQL injection work?", "Can MongoDB applications have injection vulnerabilities?", "Why is string concatenation dangerous?", "How do parameterized queries prevent injection?"]
+          },
+          {
+            name: "Secure application configuration", priority: "important",
+            sub: ["Environment variables", "Secret management", "Secure cookies", "Security headers", "Validation vs sanitization"],
+            understand: ["Secrets belong in environment variables or a secret manager, never committed to Git — a leaked key in history is still leaked even after deletion", "Validation rejects bad input; sanitization cleans/transforms input to make it safe — they solve different problems and you often need both"],
+            qs: ["Why should secrets not be committed to Git?", "What belongs in environment variables?", "Validation vs sanitization?", "Why rate-limit authentication endpoints?", "What does HttpOnly actually protect against?"]
+          }
+        ]
+      },
+
+      {
+        id: "performance", num: "07", title: "Performance &amp; optimization", topics: [
+          {
+            name: "Frontend performance", priority: "must",
+            sub: ["Bundle size", "Code splitting", "Lazy loading", "Image optimization", "Unnecessary re-renders"],
+            understand: ["Code splitting ships only the JS a route needs instead of one giant bundle; lazy loading defers loading until something is actually needed (e.g. below the fold)", "Unnecessary re-renders in React are a common hidden bottleneck — usually fixed with memoization or better state placement, not premature optimization everywhere"],
+            qs: ["How would you improve a slow React application?", "Lazy loading vs code splitting?", "Why does bundle size matter?", "How would you optimize images?", "How would you identify a frontend performance bottleneck?"]
+          },
+          {
+            name: "Caching", priority: "must",
+            sub: ["Browser, CDN &amp; server-side caching", "Database/query caching", "Cache invalidation", "TTL"],
+            flow: "Request\n   ↓\nCache hit? ── Yes → Return cached data\n   │\n   No\n   ↓\nDatabase\n   ↓\nStore result in cache\n   ↓\nReturn response",
+            understand: ["Caching can happen at almost every layer — browser, CDN, reverse proxy, application (Redis), and database query level", "Cache invalidation is famously one of the two hard problems in CS — deciding when cached data has gone stale is the real skill, not the caching itself", "Never cache carelessly data that's per-user-sensitive or changes on every write without a clear invalidation plan"],
+            qs: ["What is caching?", "Where can caching happen in a web application?", "What is a cache hit and cache miss?", "What is TTL?", "What is cache invalidation?", "What data should not be cached carelessly?"]
+          },
+          {
+            name: "Redis basics", priority: "must",
+            sub: ["In-memory key-value store", "Caching &amp; sessions", "Rate limiting", "TTL"],
+            understand: ["Redis is fast because it's in-memory, not disk-backed like a traditional database — that's the whole tradeoff (speed vs durability by default)", "It's commonly used for caching, storing sessions so servers can stay stateless, and rate-limiting counters"],
+            qs: ["Why is Redis fast?", "Redis vs MongoDB?", "Why use Redis if you already have a database?", "What happens when cached data becomes stale?", "How can Redis store sessions?"]
+          },
+          {
+            name: "Backend and database performance", priority: "important",
+            sub: ["Indexes &amp; efficient queries", "Pagination", "Avoiding blocking work", "Connection pooling basics"],
+            understand: ["Most backend slowness traces back to an unindexed query or an N+1 pattern, not the framework", "CPU-heavy synchronous work blocks Node's single thread for every request — offload it (worker threads, a queue) instead of running it inline"],
+            qs: ["Your API takes five seconds — how do you debug it?", "How do you determine whether the database is the bottleneck?", "Why can a missing index make an API slow?", "Why should CPU-heavy work not block a Node.js server?"]
+          },
+          {
+            name: "Core Web Vitals", priority: "good",
+            sub: ["LCP", "INP", "CLS"],
+            understand: ["LCP measures how fast the main content loads, INP measures interaction responsiveness, CLS measures visual stability", "Know the meaning and practical fixes for each — don't memorize exact scoring thresholds unless the role specifically requires it"],
+            qs: ["What are Core Web Vitals?", "What causes layout shifts?", "How would you improve slow content rendering?"]
+          }
+        ]
+      },
+
+      {
+        id: "testing", num: "08", title: "Testing", topics: [
+          {
+            name: "Testing fundamentals", priority: "must",
+            sub: ["Unit testing", "Integration testing", "End-to-end testing", "The testing pyramid"],
+            flow: "        E2E\n       /   \\\n Integration\n /           \\\n     Unit Tests",
+            understand: ["Unit tests are fastest and most numerous — they test one function/component in isolation", "E2E tests give the most realistic confidence (real user flow) but are slowest and most brittle, which is why they sit at the top of the pyramid, not the base"],
+            qs: ["Unit vs integration vs E2E testing?", "What should be unit tested?", "Why not test everything with E2E tests?", "Which tests are fastest?", "Which tests provide the most realistic confidence?"]
+          },
+          {
+            name: "API testing and mocking", priority: "important",
+            sub: ["Testing endpoints", "Success &amp; failure cases", "Auth tests", "Mocking external dependencies", "Test isolation"],
+            understand: ["Mocking replaces a real dependency (DB, external API) with a fake so the test stays fast and isolated from network flakiness", "Not everything should be mocked — over-mocking can hide real integration bugs, so integration tests often use a real test database"],
+            qs: ["How would you test a login API?", "What is mocking?", "When should a database be mocked?", "Should every dependency be mocked?", "How do you test an external API dependency?"]
+          }
+        ]
+      },
+
+      {
+        id: "devops", num: "09", title: "Deployment &amp; DevOps basics", topics: [
+          {
+            name: "Git and GitHub", priority: "must",
+            sub: ["Working tree &amp; staging", "Commits &amp; branches", "Merge vs rebase", "Conflicts", "Pull requests"],
+            understand: ["git fetch downloads remote changes without merging; git pull fetches and merges (or rebases) in one step", "Rebase rewrites history into a linear log; merge preserves history with a merge commit — pick based on how much history clarity the team wants"],
+            qs: ["git pull vs git fetch?", "Merge vs rebase?", "What causes merge conflicts?", "How do you undo a commit?", "What is .gitignore?"]
+          },
+          {
+            name: "Development, build &amp; production", priority: "must",
+            sub: ["Dev vs staging vs production", "Environment variables", "Frontend build process", "Build artifacts"],
+            understand: ["Environment variables let identical code behave differently per environment (DB URL, API keys) without code changes", "Frontend env variables get baked into the JS bundle at build time — they are visible to anyone, so they are not secret", "A production build typically minifies, bundles, and tree-shakes code into optimized static assets"],
+            qs: ["Development vs production?", "What happens when you run a React production build?", "Why are environment variables used?", "Are frontend environment variables secret?", "What changes when an application is deployed?"]
+          },
+          {
+            name: "Linux basics", priority: "important",
+            sub: ["Files &amp; directories", "Permissions", "Processes", "Ports", "Logs", "Core shell commands"],
+            understand: ["Be comfortable with ls, cd, pwd, mkdir, rm, cp, mv, cat, grep, ps, kill, chmod — these come up in debugging-a-server questions", "Investigating a crashed process usually means: check logs, check if the process/port is still alive (ps, lsof), check permissions"],
+            qs: ["How do you find a running process?", "How do you inspect logs?", "What are file permissions?", "How would you investigate a server process that has crashed?"]
+          },
+          {
+            name: "Docker basics", priority: "important",
+            sub: ["Container vs image", "Dockerfile basics", "Container vs virtual machine", "Ports &amp; volumes"],
+            understand: ["An image is a snapshot/blueprint; a container is a running instance of that image", "Docker solves \"works on my machine\" by packaging the app with its exact dependencies and environment", "Volumes exist because a container's own filesystem is ephemeral — data written inside it disappears when the container stops unless it's in a volume"],
+            qs: ["What problem does Docker solve?", "Image vs container?", "Docker vs virtual machine?", "Why does \"it works on my machine\" happen?", "What happens when a container stops?", "Why are volumes needed?"]
+          },
+          {
+            name: "CI/CD basics", priority: "important",
+            sub: ["Continuous integration", "Continuous delivery/deployment", "Automated tests", "Build pipelines"],
+            flow: "Push Code\n   ↓\nInstall Dependencies\n   ↓\nLint\n   ↓\nRun Tests\n   ↓\nBuild\n   ↓\nDeploy",
+            understand: ["CI automatically builds and tests every push/PR, catching integration bugs early", "CD automates getting that code safely to production — delivery stops before the final deploy step, deployment doesn't"],
+            qs: ["What is CI/CD?", "What should happen before deployment?", "Why automate deployments?", "What happens if tests fail?"]
+          },
+          {
+            name: "Nginx and reverse proxy", priority: "important",
+            sub: ["Reverse proxy role", "TLS termination", "Serving static files", "Basic load balancing"],
+            understand: ["Nginx commonly sits in front of a Node app to terminate TLS, serve static assets directly, and forward dynamic requests to the app", "TLS termination means Nginx handles the HTTPS encryption/decryption so the app server itself only deals in plain HTTP internally"],
+            qs: ["Why put Nginx in front of Node.js?", "What is a reverse proxy?", "Can Nginx serve static files?", "What is TLS termination?"]
+          },
+          {
+            name: "Domain, DNS and HTTPS deployment", priority: "must",
+            sub: ["Domain → DNS → server", "DNS records (A, CNAME)", "SSL/TLS certificates", "Certificate renewal basics"],
+            understand: ["Connecting a domain means pointing its DNS records (an A record to an IP, or a CNAME to another host) at your deployed server", "An expired SSL certificate breaks HTTPS entirely for visitors — most setups (e.g. Let's Encrypt) automate renewal to avoid this"],
+            qs: ["How do you connect a domain to a deployed application?", "What does an A record do?", "What is a CNAME?", "How does HTTPS work after deployment?", "What happens when an SSL certificate expires?"]
+          },
+          {
+            name: "Logging and monitoring", priority: "important",
+            sub: ["Application &amp; error logs", "Structured logging", "Metrics", "Health checks", "Alerts"],
+            understand: ["console.log alone doesn't survive a server restart, isn't searchable at scale, and isn't monitored — production needs structured, persisted logs", "Logging answers \"what happened\"; monitoring/alerting answers \"is it happening right now, and should someone be paged\"", "A health-check endpoint should verify real dependencies are reachable (DB, cache), not just that the process is alive"],
+            qs: ["How would you debug an error that happens only in production?", "Why is console.log alone insufficient for production systems?", "Logging vs monitoring?", "What should a health-check endpoint verify?"]
+          }
+        ]
+      },
+
+      {
+        id: "system-design", num: "10", title: "System design &amp; scalability", topics: [
+          {
+            name: "Vertical vs horizontal scaling", priority: "must",
+            sub: ["Scale up vs scale out", "Cost &amp; limits", "Architecture impact"],
+            understand: ["Vertical scaling (bigger machine) is simpler but hits a hardware ceiling and stays a single point of failure", "Horizontal scaling (more machines) needs the app to not depend on local, in-memory state — hence stateless servers", "Databases can't scale out as trivially as app servers — that's what replication/sharding exist to solve"],
+            qs: ["Vertical vs horizontal scaling?", "Which is easier?", "Why does horizontal scaling require stateless servers?", "Can databases be horizontally scaled as easily as application servers?"]
+          },
+          {
+            name: "Load balancing and stateless servers", priority: "must",
+            sub: ["Request distribution", "Health checks", "Stateless architecture", "Shared session storage"],
+            flow: "                ┌→ Server 1\nClient → Load Balancer → Server 2\n                └→ Server 3\n                       ↓\n                 Shared Database / Redis",
+            understand: ["A load balancer distributes incoming requests across multiple server instances and routes around unhealthy ones", "If session state lives in one server's memory, a load balancer sending the next request elsewhere breaks the user's session — so state moves to Redis/DB, shared by all instances"],
+            qs: ["What does a load balancer do?", "What if one server fails?", "Why should backend servers be stateless?", "Where should sessions be stored when multiple servers exist?"]
+          },
+          {
+            name: "Caching, Redis and CDN in system design", priority: "must",
+            sub: ["Application &amp; distributed cache", "CDN placement", "Cache invalidation at scale"],
+            understand: ["Add caching closest to where the repeated, expensive work happens — a hot DB query, a rendered page, a computed value", "CDN caches at the edge (closest to the user, for static/shared content); Redis caches shared application data closer to your servers"],
+            qs: ["Where would you add caching to a high-traffic application?", "Redis vs CDN?", "What should be cached at the edge?", "What happens when cache data becomes stale?"]
+          },
+          {
+            name: "Database scaling", priority: "important",
+            sub: ["Replication &amp; read replicas", "Sharding", "Read/write scaling"],
+            understand: ["Read replicas offload read traffic from the primary, improving read scalability without touching write capacity", "Sharding solves storage/write limits but introduces cross-shard query complexity — avoid it until simpler options (indexing, replicas, caching) are exhausted"],
+            qs: ["Replication vs sharding?", "How can read replicas improve scalability?", "What problems does sharding introduce?", "When would you avoid sharding?"]
+          },
+          {
+            name: "Message queues", priority: "important",
+            sub: ["Producers &amp; consumers", "Background jobs", "Decoupling", "Retry basics"],
+            flow: "API Server\n    ↓\nMessage Queue\n    ↓\nWorker\n    ↓\nEmail / Image Processing / Notification",
+            understand: ["A queue lets slow or unreliable work (sending an email, processing an image) happen asynchronously without blocking the user's request", "Decoupling producer from consumer means a crashed worker doesn't take down the API — the job just waits in the queue to be retried"],
+            qs: ["Why use a message queue?", "Why not send an email directly inside an API request?", "What happens if a worker crashes?", "Synchronous vs asynchronous processing?"]
+          },
+          {
+            name: "Monolith vs microservices", priority: "important",
+            sub: ["Monolithic architecture", "Microservices", "Deployment independence", "Operational complexity"],
+            understand: ["Microservices solve organizational and independent-scaling problems, at the direct cost of network calls, distributed data consistency, and operational overhead", "A well-structured monolith is often the better starting point for a small team or early-stage product — this is the strong junior-level answer"],
+            qs: ["Monolith vs microservices?", "Why are microservices not automatically better?", "When should a startup use a monolith?", "What new problems do microservices introduce?"]
+          },
+          {
+            name: "High availability", priority: "important",
+            sub: ["Redundancy", "Failure tolerance", "Multiple instances", "Avoiding single points of failure"],
+            understand: ["High availability means the system keeps running despite individual component failures, usually via redundancy plus health checks and failover", "A single point of failure is any one component whose failure takes down the whole system — the fix is always some form of redundancy"],
+            qs: ["What is high availability?", "What is a single point of failure?", "How would you make an application more fault tolerant?", "What happens if one backend server goes down?"]
+          },
+          {
+            name: "CAP theorem", priority: "good",
+            sub: ["Consistency", "Availability", "Partition tolerance", "The basic tradeoff"],
+            understand: ["CAP only forces a choice during an actual network partition — you can't have perfect consistency and availability at the same time when nodes can't talk to each other", "Don't go deep into distributed-systems theory for fresher interviews — the concept and the tradeoff are enough"],
+            qs: ["What is the CAP theorem?", "What does partition tolerance mean?", "Can a distributed system guarantee everything during a network partition?"]
+          }
+        ]
+      }
+    ];
+
+    const PLABEL = { must: "must know", important: "important", good: "good to know" };
+    const state = { filter: "all", done: new Set() };
+
+    function render() {
+      const modulesEl = document.getElementById("modules");
+      const navEl = document.getElementById("nav-list");
+      const glanceEl = document.getElementById("glance-chain");
+      const crosscutEl = document.getElementById("crosscut-grid");
+      modulesEl.innerHTML = ""; navEl.innerHTML = ""; glanceEl.innerHTML = ""; crosscutEl.innerHTML = "";
+
+      CROSSCUT.forEach(c => {
+        const row = document.createElement("div");
+        row.className = "crosscut-row";
+        row.innerHTML = `<span class="crosscut-concept">${c.name}</span><span class="crosscut-depth ${c.depth}">${c.depth === "deep" ? "deep" : "strong"}</span>`;
+        crosscutEl.appendChild(row);
+      });
+
+      let totalTopics = 0;
+
+      DATA.forEach((mod, i) => {
+        const li = document.createElement("li");
+        li.className = "nav-item";
+        li.innerHTML = `<a href="#${mod.id}"><span class="nav-num">${mod.num}</span><span>${mod.title.replace(/&amp;/g, "&")}</span><span class="nav-count">${mod.topics.length}</span></a>`;
+        navEl.appendChild(li);
+
+        const chip = document.createElement("a");
+        chip.className = "glance-chip";
+        chip.href = "#" + mod.id;
+        chip.innerHTML = `<b>${mod.num}</b>${mod.title.replace(/&amp;/g, "&")}`;
+        glanceEl.appendChild(chip);
+        if (i < DATA.length - 1) {
+          const arrow = document.createElement("span");
+          arrow.className = "glance-arrow";
+          arrow.textContent = "→";
+          glanceEl.appendChild(arrow);
+        }
+
+        const counts = { must: 0, important: 0, good: 0 };
+        mod.topics.forEach(t => { counts[t.priority]++; totalTopics++; });
+        const meterTotal = mod.topics.length;
+
+        const section = document.createElement("section");
+        section.className = "module";
+        section.id = mod.id;
+        section.innerHTML = `
+      <div class="module-head">
+        <span class="module-num">${mod.num}</span>
+        <span class="module-title">${mod.title}</span>
+        <div class="module-meter">
+          <div class="meter-seg must" style="width:${counts.must / meterTotal * 100}%"></div>
+          <div class="meter-seg important" style="width:${counts.important / meterTotal * 100}%"></div>
+          <div class="meter-seg good" style="width:${counts.good / meterTotal * 100}%"></div>
+        </div>
+      </div>
+      <div class="cards"></div>
+    `;
+        const cardsEl = section.querySelector(".cards");
+
+        mod.topics.forEach((topic, idx) => {
+          const cardId = mod.id + "-" + idx;
+          const card = document.createElement("div");
+          card.className = "card";
+          card.dataset.priority = topic.priority;
+          const subPreview = topic.sub.slice(0, 3).join(" · ");
+
+          let flowHtml = "";
+          if (topic.flow) {
+            flowHtml = `<div class="cb-block"><div class="cb-label">how it flows</div><div class="cb-flow">${topic.flow}</div></div>`;
+          }
+
+          card.innerHTML = `
+        <div class="card-head">
+          <div class="card-check" data-card="${cardId}"></div>
+          <div class="card-title-wrap">
+            <div class="card-title">${topic.name}</div>
+            <div class="card-sub">${subPreview}</div>
+          </div>
+          <span class="badge ${topic.priority}">${PLABEL[topic.priority]}</span>
+          <span class="chevron">›</span>
+        </div>
+        <div class="card-body">
+          <div class="card-body-inner">
+            <div class="cb-block">
+              <div class="cb-label">subtopics</div>
+              <ul class="cb-list sub">${topic.sub.map(s => `<li>${s}</li>`).join("")}</ul>
+            </div>
+            ${flowHtml}
+            <div class="cb-block">
+              <div class="cb-label">what to actually understand</div>
+              <ul class="cb-list understand">${topic.understand.map(s => `<li>${s}</li>`).join("")}</ul>
+            </div>
+            <div class="cb-block">
+              <div class="cb-label">most-asked interview questions</div>
+              <ul class="cb-list qs">${topic.qs.map(s => `<li>${s}</li>`).join("")}</ul>
+            </div>
+          </div>
+        </div>
+      `;
+
+          const head = card.querySelector(".card-head");
+          head.addEventListener("click", (e) => {
+            if (e.target.classList.contains("card-check")) return;
+            card.classList.toggle("open");
+          });
+
+          const check = card.querySelector(".card-check");
+          check.addEventListener("click", (e) => {
+            e.stopPropagation();
+            if (state.done.has(cardId)) { state.done.delete(cardId); } else { state.done.add(cardId); }
+            updateCheck(cardId);
+            updateProgress();
+          });
+
+          cardsEl.appendChild(card);
+        });
+
+        modulesEl.appendChild(section);
+      });
+
+      document.getElementById("progress-text").textContent = `0 / ${totalTopics}`;
+      window.TOTAL_TOPICS = totalTopics;
+      applyFilter();
+      setupScrollSpy();
+    }
+
+    function updateCheck(cardId) {
+      const el = document.querySelector(`.card-check[data-card="${cardId}"]`);
+      const titleEl = el.closest(".card").querySelector(".card-title");
+      if (state.done.has(cardId)) { el.classList.add("done"); titleEl.classList.add("done"); }
+      else { el.classList.remove("done"); titleEl.classList.remove("done"); }
+    }
+
+    function updateProgress() {
+      const total = window.TOTAL_TOPICS || 0;
+      const done = state.done.size;
+      document.getElementById("progress-text").textContent = `${done} / ${total}`;
+      const pct = total ? (done / total * 100) : 0;
+      document.getElementById("progress-fill").style.width = pct + "%";
+    }
+
+    function applyFilter() {
+      document.querySelectorAll(".card").forEach(card => {
+        if (state.filter === "all" || card.dataset.priority === state.filter) { card.classList.remove("hidden"); }
+        else { card.classList.add("hidden"); }
+      });
+    }
+
+    document.getElementById("filter-row").addEventListener("click", (e) => {
+      const btn = e.target.closest(".filter-btn");
+      if (!btn) return;
+      document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      state.filter = btn.dataset.p;
+      applyFilter();
+    });
+
+    function setupScrollSpy() {
+      const sections = DATA.map(m => document.getElementById(m.id));
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            document.querySelectorAll(".nav-item a").forEach(l => l.classList.remove("active-link"));
+            const link = document.querySelector(`.nav-item a[href="#${entry.target.id}"]`);
+            if (link) link.classList.add("active-link");
+          }
+        });
+      }, { rootMargin: "-10% 0px -70% 0px" });
+      sections.forEach(s => { if (s) observer.observe(s); });
+    }
+
+    render();
+  </script>
+</body>
+
+</html>

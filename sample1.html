@@ -1,0 +1,3324 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CS Engineering Guide</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap"
+    rel="stylesheet">
+  <link rel="icon" type="image/svg+xml"
+    href="data:image/svg+xml,%3Csvg width='64' height='64' viewBox='0 0 64 64' xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='64' height='64' rx='12' fill='%230b0d11'/%3E%3Ccircle cx='32' cy='30' r='10' fill='%230b0d11' stroke='%234fffb0' stroke-width='1.8'/%3E%3Ccircle cx='32' cy='30' r='7' fill='%234fffb0' fill-opacity='0.12'/%3E%3Ctext font-family='monospace' font-size='7' font-weight='bold' fill='%234fffb0' text-anchor='middle' dominant-baseline='central' x='32' y='30'%3EDSA%3C/text%3E%3C/svg%3E">
+  <style>
+    /* ── THEME TOKENS ── */
+    :root,
+    [data-theme="dark"] {
+      --bg: #0b0d11;
+      --surface: #12151c;
+      --surface2: #161a24;
+      --border: #1e2330;
+      --accent: #4fffb0;
+      --accent2: #7b61ff;
+      --text: #dde3f0;
+      --muted: #5a6280;
+      --danger: #ff5c5c;
+      --warn: #ffa94d;
+      --lc: #ffa116;
+      --shadow: rgba(0, 0, 0, 0.5);
+    }
+
+    [data-theme="light"] {
+      --bg: #f0f2f7;
+      --surface: #ffffff;
+      --surface2: #f7f8fc;
+      --border: #dce1ef;
+      --accent: #0a9e6e;
+      --accent2: #5b3fc4;
+      --text: #1a1d2e;
+      --muted: #7a82a0;
+      --danger: #d63031;
+      --warn: #e17055;
+      --lc: #d68910;
+      --shadow: rgba(0, 0, 0, 0.08);
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0
+    }
+
+    html {
+      transition: background 0.3s ease, color 0.3s ease
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Syne', sans-serif;
+      min-height: 100vh;
+      transition: background 0.3s, color 0.3s
+    }
+
+    /* ── THEME TOGGLE ── */
+    .theme-toggle {
+      position: fixed;
+      top: 16px;
+      right: 16px;
+      z-index: 200;
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
+      font-size: 1.1rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      box-shadow: 0 2px 12px var(--shadow);
+    }
+
+    .theme-toggle:hover {
+      border-color: var(--accent);
+      background: var(--surface2)
+    }
+
+    /* ── SECTION TABS ── */
+    .section-tabs {
+      max-width: 860px;
+      margin: 0 auto 24px;
+      display: flex;
+      gap: 4px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 4px;
+      transition: background 0.3s, border-color 0.3s
+    }
+
+    .section-tab {
+      flex: 1;
+      padding: 9px 12px;
+      border: none;
+      background: transparent;
+      border-radius: 8px;
+      color: var(--muted);
+      font-family: 'Syne', sans-serif;
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.18s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px
+    }
+
+    .section-tab.active {
+      background: var(--surface);
+      color: var(--text);
+      box-shadow: 0 1px 8px var(--shadow)
+    }
+
+    .tab-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      flex-shrink: 0
+    }
+
+    /* ── HEADER ── */
+    header {
+      text-align: center;
+      margin-bottom: 24px
+    }
+
+    header h1 {
+      font-size: clamp(1.8rem, 5vw, 3.2rem);
+      font-weight: 800;
+      letter-spacing: -1px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1.1
+    }
+
+    header p {
+      margin-top: 8px;
+      color: var(--muted);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78rem;
+      letter-spacing: 1px
+    }
+
+    .prog-wrap {
+      max-width: 600px;
+      margin: 14px auto 0;
+      background: var(--border);
+      border-radius: 999px;
+      height: 6px;
+      overflow: hidden
+    }
+
+    .prog-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      border-radius: 999px;
+      transition: width 0.4s ease;
+      width: 0%
+    }
+
+    .prog-label {
+      text-align: center;
+      margin-top: 6px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--muted)
+    }
+
+    /* ── DEADLINE ── */
+    .deadline-banner {
+      max-width: 860px;
+      margin: 0 auto 28px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px 20px;
+      transition: background 0.3s, border-color 0.3s
+    }
+
+    .deadline-banner.has-date {
+      border-color: rgba(79, 255, 176, 0.3)
+    }
+
+    [data-theme="light"] .deadline-banner.has-date {
+      border-color: rgba(10, 158, 110, 0.4)
+    }
+
+    .deadline-top {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap
+    }
+
+    .deadline-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.68rem;
+      color: var(--muted);
+      letter-spacing: 1px;
+      text-transform: uppercase
+    }
+
+    .deadline-input {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      color: var(--text);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78rem;
+      padding: 6px 10px;
+      outline: none;
+      transition: border-color 0.15s
+    }
+
+    .deadline-input:focus {
+      border-color: var(--accent)
+    }
+
+    .dl-clear {
+      background: transparent;
+      border: none;
+      color: var(--muted);
+      font-size: 0.75rem;
+      cursor: pointer;
+      font-family: 'JetBrains Mono', monospace;
+      padding: 4px 6px;
+      border-radius: 4px
+    }
+
+    .dl-clear:hover {
+      color: var(--danger)
+    }
+
+    .pacing-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(148px, 1fr));
+      gap: 10px;
+      margin-top: 14px
+    }
+
+    .pacing-card {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 14px;
+      transition: background 0.3s
+    }
+
+    .pc-val {
+      font-size: 1.55rem;
+      font-weight: 800;
+      line-height: 1;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text
+    }
+
+    .pc-val.warn {
+      background: none;
+      -webkit-text-fill-color: var(--warn);
+      color: var(--warn)
+    }
+
+    .pc-val.danger {
+      background: none;
+      -webkit-text-fill-color: var(--danger);
+      color: var(--danger)
+    }
+
+    .pc-lbl {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.63rem;
+      color: var(--muted);
+      margin-top: 4px
+    }
+
+    .week-bar-wrap {
+      margin-top: 8px;
+      background: var(--border);
+      border-radius: 999px;
+      height: 4px;
+      overflow: hidden
+    }
+
+    .week-bar-fill {
+      height: 100%;
+      border-radius: 999px;
+      transition: width 0.4s
+    }
+
+    /* ── CONTAINER ── */
+    .container {
+      max-width: 860px;
+      margin: 0 auto
+    }
+
+    /* ── PHASE ── */
+    .phase {
+      margin-bottom: 36px
+    }
+
+    .phase-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border)
+    }
+
+    .phase-badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      padding: 4px 10px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      flex-shrink: 0
+    }
+
+    .phase-title {
+      font-size: 1.1rem;
+      font-weight: 800;
+      flex: 1
+    }
+
+    .btn-add-topic {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.68rem;
+      color: var(--accent);
+      background: rgba(79, 255, 176, 0.07);
+      border: 1px solid rgba(79, 255, 176, 0.2);
+      border-radius: 6px;
+      padding: 5px 10px;
+      cursor: pointer;
+      transition: all 0.15s;
+      white-space: nowrap
+    }
+
+    .btn-add-topic:hover {
+      background: rgba(79, 255, 176, 0.15);
+      border-color: var(--accent)
+    }
+
+    /* ── TOPIC ── */
+    .topic {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      margin-bottom: 8px;
+      overflow: hidden;
+      transition: border-color 0.2s, background 0.3s
+    }
+
+    .topic:hover {
+      border-color: var(--muted)
+    }
+
+    .topic-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 13px 15px;
+      cursor: pointer;
+      user-select: none
+    }
+
+    .topic-header:hover {
+      background: rgba(0, 0, 0, 0.04)
+    }
+
+    [data-theme="light"] .topic-header:hover {
+      background: rgba(0, 0, 0, 0.03)
+    }
+
+    .topic-num {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.65rem;
+      color: var(--muted);
+      width: 22px;
+      flex-shrink: 0
+    }
+
+    .topic-checkbox {
+      width: 17px;
+      height: 17px;
+      border: 2px solid var(--muted);
+      border-radius: 4px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s;
+      cursor: pointer
+    }
+
+    .topic-checkbox.checked {
+      background: var(--accent);
+      border-color: var(--accent)
+    }
+
+    .topic-checkbox.checked::after {
+      content: '✓';
+      font-size: 10px;
+      color: #000;
+      font-weight: 700
+    }
+
+    .topic-checkbox.partial {
+      background: rgba(79, 255, 176, 0.18);
+      border-color: var(--accent)
+    }
+
+    [data-theme="light"] .topic-checkbox.partial {
+      background: rgba(10, 158, 110, 0.15)
+    }
+
+    .topic-checkbox.partial::after {
+      content: '–';
+      font-size: 13px;
+      color: var(--accent);
+      font-weight: 700
+    }
+
+    .topic-name {
+      font-size: 0.9rem;
+      font-weight: 700;
+      flex: 1;
+      min-width: 0
+    }
+
+    .topic-name.done {
+      text-decoration: line-through;
+      color: var(--muted)
+    }
+
+    .topic-progress {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.66rem;
+      color: var(--muted);
+      white-space: nowrap
+    }
+
+    .topic-actions {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      flex-shrink: 0
+    }
+
+    .icon-btn {
+      width: 26px;
+      height: 26px;
+      border-radius: 6px;
+      border: none;
+      background: transparent;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: all 0.15s;
+      color: var(--muted)
+    }
+
+    .icon-btn:hover {
+      background: rgba(0, 0, 0, 0.08)
+    }
+
+    .icon-btn.add-sub {
+      color: var(--accent);
+      font-size: 1rem
+    }
+
+    .icon-btn.add-sub:hover {
+      background: rgba(79, 255, 176, 0.12)
+    }
+
+    .icon-btn.del:hover {
+      background: rgba(255, 92, 92, 0.12);
+      color: var(--danger)
+    }
+
+    .toggle-icon {
+      font-size: 0.68rem;
+      color: var(--muted);
+      transition: transform 0.2s;
+      flex-shrink: 0
+    }
+
+    .toggle-icon.open {
+      transform: rotate(90deg)
+    }
+
+    /* ── SUBTOPICS ── */
+    .subtopics {
+      display: none;
+      border-top: 1px solid var(--border);
+      background: var(--surface2);
+      transition: background 0.3s
+    }
+
+    .subtopics.open {
+      display: block
+    }
+
+    .subtopic-wrap {
+      border-bottom: 1px solid var(--border)
+    }
+
+    .subtopic-wrap:last-child {
+      border-bottom: none
+    }
+
+    .subtopic-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      padding: 8px 14px 8px 48px
+    }
+
+    .sub-left {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      flex: 1;
+      cursor: pointer
+    }
+
+    .sub-left:hover .sub-cb {
+      border-color: var(--accent)
+    }
+
+    .sub-cb {
+      width: 14px;
+      height: 14px;
+      border: 1.5px solid var(--muted);
+      border-radius: 3px;
+      flex-shrink: 0;
+      margin-top: 3px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s
+    }
+
+    .sub-cb.checked {
+      background: var(--accent);
+      border-color: var(--accent)
+    }
+
+    .sub-cb.checked::after {
+      content: '✓';
+      font-size: 8px;
+      color: #000;
+      font-weight: 700
+    }
+
+    .sub-label {
+      font-size: 0.82rem;
+      color: var(--text);
+      line-height: 1.5
+    }
+
+    .sub-label strong {
+      color: var(--accent);
+      font-weight: 700
+    }
+
+    .sub-label.done {
+      text-decoration: line-through;
+      color: var(--muted)
+    }
+
+    .sub-label.done strong {
+      color: var(--muted)
+    }
+
+    .sub-actions {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      flex-shrink: 0;
+      margin-top: 1px
+    }
+
+    .sub-icon {
+      width: 22px;
+      height: 22px;
+      border-radius: 5px;
+      border: none;
+      background: transparent;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 0.75rem;
+      color: var(--muted);
+      transition: all 0.15s;
+      opacity: 0
+    }
+
+    .subtopic-wrap:hover .sub-icon {
+      opacity: 1
+    }
+
+    .sub-icon:hover {
+      background: rgba(0, 0, 0, 0.08);
+      color: var(--text)
+    }
+
+    .sub-icon.del:hover {
+      background: rgba(255, 92, 92, 0.12);
+      color: var(--danger)
+    }
+
+    .sub-icon.note-btn.active {
+      opacity: 1;
+      color: var(--accent2)
+    }
+
+    /* ── NOTE DRAWER ── */
+    .note-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 300;
+      background: rgba(5, 7, 11, 0.8);
+      backdrop-filter: blur(6px);
+      align-items: flex-end;
+      justify-content: center
+    }
+
+    [data-theme="light"] .note-overlay {
+      background: rgba(30, 40, 80, 0.5)
+    }
+
+    .note-overlay.open {
+      display: flex
+    }
+
+    .note-drawer {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-bottom: none;
+      border-radius: 20px 20px 0 0;
+      width: 100%;
+      max-width: 780px;
+      max-height: 95vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 -12px 60px var(--shadow);
+      animation: ndSlideUp 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+      transition: background 0.3s
+    }
+
+    @keyframes ndSlideUp {
+      from {
+        transform: translateY(50px);
+        opacity: 0
+      }
+
+      to {
+        transform: translateY(0);
+        opacity: 1
+      }
+    }
+
+    .note-drawer-handle {
+      width: 36px;
+      height: 4px;
+      background: var(--border);
+      border-radius: 999px;
+      margin: 12px auto 0;
+      flex-shrink: 0
+    }
+
+    .note-drawer-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 16px 24px 14px;
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0
+    }
+
+    .note-drawer-title {
+      flex: 1
+    }
+
+    .note-drawer-topic {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.65rem;
+      color: var(--muted);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 4px
+    }
+
+    .note-drawer-sub {
+      font-size: 0.93rem;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1.4
+    }
+
+    .note-drawer-sub strong {
+      color: var(--accent)
+    }
+
+    .note-drawer-close {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--muted);
+      font-size: 1.1rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: all 0.15s;
+      margin-top: 2px
+    }
+
+    .note-drawer-close:hover {
+      border-color: var(--danger);
+      color: var(--danger);
+      background: rgba(255, 92, 92, 0.08)
+    }
+
+    .note-drawer-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px 24px 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px
+    }
+
+    .note-drawer-body::-webkit-scrollbar {
+      width: 4px
+    }
+
+    .note-drawer-body::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 999px
+    }
+
+    .nd-section-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.65rem;
+      color: var(--muted);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 10px
+    }
+
+    .nd-section-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border)
+    }
+
+    .lc-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 10px
+    }
+
+    .lc-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--lc);
+      background: rgba(255, 161, 22, 0.08);
+      border: 1px solid rgba(255, 161, 22, 0.22);
+      border-radius: 6px;
+      padding: 5px 10px;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.12s
+    }
+
+    .lc-chip:hover {
+      background: rgba(255, 161, 22, 0.16);
+      border-color: var(--lc)
+    }
+
+    .lc-chip .chip-x {
+      color: var(--muted);
+      font-size: 0.6rem;
+      padding-left: 2px
+    }
+
+    .lc-chip .chip-x:hover {
+      color: var(--danger)
+    }
+
+    .lc-add-row {
+      display: flex;
+      gap: 8px;
+      align-items: center
+    }
+
+    .lc-badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.63rem;
+      color: var(--lc);
+      background: rgba(255, 161, 22, 0.08);
+      border: 1px solid rgba(255, 161, 22, 0.22);
+      border-radius: 5px;
+      padding: 7px 10px;
+      white-space: nowrap;
+      flex-shrink: 0
+    }
+
+    .nd-input {
+      flex: 1;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78rem;
+      padding: 8px 12px;
+      outline: none;
+      transition: border-color 0.15s
+    }
+
+    .nd-input:focus {
+      border-color: var(--accent2)
+    }
+
+    .nd-input::placeholder {
+      color: var(--muted)
+    }
+
+    .nd-btn {
+      background: rgba(79, 255, 176, 0.08);
+      border: 1px solid rgba(79, 255, 176, 0.22);
+      border-radius: 8px;
+      color: var(--accent);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.73rem;
+      padding: 8px 14px;
+      cursor: pointer;
+      transition: all 0.15s;
+      white-space: nowrap
+    }
+
+    .nd-btn:hover {
+      background: rgba(79, 255, 176, 0.16)
+    }
+
+    .nd-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      align-items: center;
+      padding: 8px 10px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-bottom: none;
+      border-radius: 10px 10px 0 0;
+      transition: background 0.3s
+    }
+
+    .nd-tb-group {
+      display: flex;
+      gap: 2px;
+      align-items: center;
+      padding-right: 8px;
+      margin-right: 4px;
+      border-right: 1px solid var(--border)
+    }
+
+    .nd-tb-group:last-child {
+      border-right: none;
+      padding-right: 0;
+      margin-right: 0
+    }
+
+    .nd-tb-btn {
+      width: 28px;
+      height: 26px;
+      border-radius: 5px;
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      font-size: 0.8rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.12s;
+      flex-shrink: 0;
+      font-family: 'JetBrains Mono', monospace
+    }
+
+    .nd-tb-btn:hover {
+      background: rgba(0, 0, 0, 0.08);
+      color: var(--text)
+    }
+
+    .nd-tb-btn.active {
+      background: rgba(123, 97, 255, 0.18);
+      color: var(--accent2)
+    }
+
+    .nd-tb-select {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      color: var(--muted);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      padding: 3px 5px;
+      cursor: pointer;
+      outline: none;
+      height: 26px;
+      transition: background 0.3s
+    }
+
+    .nd-tb-select option {
+      background: var(--surface)
+    }
+
+    .nd-color-row {
+      display: flex;
+      gap: 4px;
+      align-items: center
+    }
+
+    .nd-color-dot {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: all 0.12s;
+      flex-shrink: 0
+    }
+
+    .nd-color-dot:hover {
+      transform: scale(1.3);
+      border-color: rgba(255, 255, 255, 0.4)
+    }
+
+    .nd-editor {
+      width: 100%;
+      min-height: 420px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-top: none;
+      border-radius: 0 0 10px 10px;
+      color: var(--text);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.84rem;
+      line-height: 1.82;
+      padding: 14px 16px;
+      outline: none;
+      overflow-y: auto;
+      word-break: break-word;
+      transition: background 0.3s, border-color 0.15s
+    }
+
+    .nd-editor:focus {
+      border-color: var(--accent2)
+    }
+
+    .nd-editor:empty:before {
+      content: attr(data-placeholder);
+      color: var(--muted);
+      pointer-events: none
+    }
+
+    .nd-editor h1 {
+      font-size: 1.4rem;
+      font-weight: 800;
+      margin: 8px 0 4px
+    }
+
+    .nd-editor h2 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin: 6px 0 3px
+    }
+
+    .nd-editor h3 {
+      font-size: 0.95rem;
+      font-weight: 700;
+      margin: 4px 0 2px;
+      color: var(--accent)
+    }
+
+    .nd-editor ul,
+    .nd-editor ol {
+      padding-left: 22px;
+      margin: 4px 0
+    }
+
+    .nd-editor code {
+      background: rgba(79, 255, 176, 0.08);
+      border: 1px solid rgba(79, 255, 176, 0.15);
+      border-radius: 4px;
+      padding: 1px 6px;
+      font-size: 0.78rem;
+      color: var(--accent)
+    }
+
+    .nd-editor mark {
+      background: rgba(253, 230, 138, 0.22);
+      color: #fde68a;
+      border-radius: 3px;
+      padding: 0 2px
+    }
+
+    .nd-editor blockquote {
+      border-left: 3px solid var(--accent2);
+      margin: 6px 0;
+      padding: 4px 12px;
+      color: var(--muted);
+      background: rgba(123, 97, 255, 0.05);
+      border-radius: 0 6px 6px 0
+    }
+
+    .nd-save-status {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.66rem;
+      color: var(--muted);
+      text-align: right;
+      transition: color 0.3s;
+      margin-top: 4px
+    }
+
+    .nd-save-status.saved {
+      color: var(--accent)
+    }
+
+    /* ── ADD FORMS ── */
+    .add-sub-row {
+      display: flex;
+      gap: 7px;
+      padding: 9px 14px 8px 48px;
+      align-items: center;
+      border-top: 1px solid var(--border);
+      background: var(--surface2)
+    }
+
+    .add-topic-form {
+      background: var(--surface);
+      border: 1px dashed rgba(79, 255, 176, 0.3);
+      border-radius: 12px;
+      padding: 12px 14px;
+      margin-bottom: 8px;
+      display: flex;
+      gap: 8px;
+      align-items: center
+    }
+
+    .form-input {
+      flex: 1;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      color: var(--text);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.76rem;
+      padding: 7px 11px;
+      outline: none;
+      transition: border-color 0.15s
+    }
+
+    .form-input.topic-inp {
+      font-family: 'Syne', sans-serif;
+      font-size: 0.88rem;
+      font-weight: 700
+    }
+
+    .form-input:focus {
+      border-color: var(--accent)
+    }
+
+    .form-input::placeholder {
+      color: var(--muted);
+      font-weight: 400;
+      font-family: 'JetBrains Mono', monospace
+    }
+
+    .form-btn {
+      background: rgba(79, 255, 176, 0.1);
+      border: 1px solid rgba(79, 255, 176, 0.28);
+      border-radius: 7px;
+      color: var(--accent);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      padding: 7px 12px;
+      cursor: pointer;
+      transition: all 0.15s;
+      white-space: nowrap
+    }
+
+    .form-btn:hover {
+      background: rgba(79, 255, 176, 0.2)
+    }
+
+    .form-btn.cancel {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--muted)
+    }
+
+    .form-btn.cancel:hover {
+      border-color: var(--danger);
+      color: var(--danger);
+      background: transparent
+    }
+
+    /* ── BOTTOM ── */
+    .bottom-actions {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 28px;
+      flex-wrap: wrap
+    }
+
+    .bottom-btn {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      padding: 8px 16px;
+      border-radius: 7px;
+      cursor: pointer;
+      transition: all 0.15s
+    }
+
+    .bottom-btn:hover {
+      border-color: var(--danger);
+      color: var(--danger)
+    }
+
+    /* ── MODAL ── */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      z-index: 200;
+      align-items: center;
+      justify-content: center
+    }
+
+    .modal-overlay.open {
+      display: flex
+    }
+
+    .modal {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 24px 20px;
+      max-width: 400px;
+      width: 90%;
+      transition: background 0.3s
+    }
+
+    .modal h3 {
+      font-size: 0.9rem;
+      margin-bottom: 16px;
+      line-height: 1.5
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end
+    }
+
+    .modal-actions button {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.74rem;
+      padding: 7px 14px;
+      border-radius: 7px;
+      cursor: pointer;
+      transition: all 0.15s
+    }
+
+    .modal-confirm {
+      background: rgba(255, 92, 92, 0.1);
+      border: 1px solid rgba(255, 92, 92, 0.35);
+      color: var(--danger)
+    }
+
+    .modal-confirm:hover {
+      background: rgba(255, 92, 92, 0.2)
+    }
+
+    .modal-cancel {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--muted)
+    }
+
+    .modal-cancel:hover {
+      color: var(--text);
+      border-color: var(--muted)
+    }
+
+    /* ── GUIDE ── */
+    .guide-topic {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      margin-bottom: 8px;
+      overflow: hidden;
+      transition: background 0.3s, border-color 0.2s
+    }
+
+    .guide-topic:hover {
+      border-color: var(--muted)
+    }
+
+    .guide-topic-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 13px 15px;
+      cursor: pointer;
+      user-select: none
+    }
+
+    .guide-topic-header:hover {
+      background: rgba(0, 0, 0, 0.04)
+    }
+
+    .guide-topic-num {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.65rem;
+      color: var(--muted);
+      width: 22px;
+      flex-shrink: 0
+    }
+
+    .guide-topic-name {
+      font-size: 0.9rem;
+      font-weight: 700;
+      flex: 1
+    }
+
+    .guide-topic-sub {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.65rem;
+      color: var(--muted)
+    }
+
+    .guide-toggle-icon {
+      font-size: 0.68rem;
+      color: var(--muted);
+      transition: transform 0.2s;
+      flex-shrink: 0
+    }
+
+    .guide-toggle-icon.open {
+      transform: rotate(90deg)
+    }
+
+    .guide-body {
+      display: none;
+      border-top: 1px solid var(--border);
+      background: var(--surface2);
+      padding: 0 15px 14px 48px
+    }
+
+    .guide-body.open {
+      display: block
+    }
+
+    .guide-def {
+      font-size: 0.82rem;
+      color: var(--muted);
+      line-height: 1.6;
+      padding: 12px 0 8px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 8px
+    }
+
+    .guide-section-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.62rem;
+      color: var(--muted);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin: 10px 0 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px
+    }
+
+    .guide-section-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border)
+    }
+
+    .guide-list {
+      display: flex;
+      flex-direction: column;
+      gap: 3px
+    }
+
+    .guide-item {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--text);
+      padding: 3px 0;
+      line-height: 1.5
+    }
+
+    .guide-item::before {
+      content: '• ';
+      color: var(--accent)
+    }
+
+    /* ── APTITUDE ── */
+    .apt-section {
+      margin-bottom: 36px
+    }
+
+    .apt-section-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border)
+    }
+
+    .apt-section-badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      padding: 4px 10px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      flex-shrink: 0
+    }
+
+    .apt-section-title {
+      font-size: 1.1rem;
+      font-weight: 800;
+      flex: 1
+    }
+
+    .apt-section-count {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.68rem;
+      color: var(--muted)
+    }
+
+    .apt-phase-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--muted);
+      padding: 14px 0 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .apt-phase-label::before {
+      content: '›';
+      color: var(--accent);
+      font-size: 0.85rem
+    }
+
+    .apt-phase-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border)
+    }
+
+    .apt-topic {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      margin-bottom: 8px;
+      overflow: hidden;
+      transition: background 0.3s, border-color 0.2s
+    }
+
+    .apt-topic:hover {
+      border-color: var(--muted)
+    }
+
+    .apt-topic-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 13px 15px;
+      cursor: pointer;
+      user-select: none
+    }
+
+    .apt-topic-header:hover {
+      background: rgba(0, 0, 0, 0.04)
+    }
+
+    .apt-topic-num {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.65rem;
+      color: var(--muted);
+      width: 22px;
+      flex-shrink: 0
+    }
+
+    .apt-cb {
+      width: 17px;
+      height: 17px;
+      border: 2px solid var(--muted);
+      border-radius: 4px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s;
+      cursor: pointer
+    }
+
+    .apt-cb.checked {
+      background: var(--accent);
+      border-color: var(--accent)
+    }
+
+    .apt-cb.checked::after {
+      content: '✓';
+      font-size: 10px;
+      color: #000;
+      font-weight: 700
+    }
+
+    .apt-cb.partial {
+      background: rgba(79, 255, 176, 0.18);
+      border-color: var(--accent)
+    }
+
+    .apt-cb.partial::after {
+      content: '–';
+      font-size: 13px;
+      color: var(--accent);
+      font-weight: 700
+    }
+
+    .apt-topic-info {
+      flex: 1;
+      min-width: 0
+    }
+
+    .apt-topic-name {
+      font-size: 0.9rem;
+      font-weight: 700
+    }
+
+    .apt-topic-name.done {
+      text-decoration: line-through;
+      color: var(--muted)
+    }
+
+    .apt-topic-sub {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.63rem;
+      color: var(--muted);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      margin-top: 2px
+    }
+
+    .apt-topic-progress {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.66rem;
+      color: var(--muted);
+      white-space: nowrap
+    }
+
+    .apt-toggle-icon {
+      font-size: 0.68rem;
+      color: var(--muted);
+      transition: transform 0.2s;
+      flex-shrink: 0
+    }
+
+    .apt-toggle-icon.open {
+      transform: rotate(90deg)
+    }
+
+    .apt-subtopics {
+      display: none;
+      border-top: 1px solid var(--border);
+      background: var(--surface2);
+      transition: background 0.3s
+    }
+
+    .apt-subtopics.open {
+      display: block
+    }
+
+    .apt-def {
+      margin: 12px 14px 4px 48px;
+      padding: 10px 14px;
+      background: rgba(79, 255, 176, 0.04);
+      border-left: 3px solid var(--accent);
+      border-radius: 0 8px 8px 0;
+      font-size: 0.78rem;
+      color: var(--muted);
+      line-height: 1.6;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    [data-theme="light"] .apt-def {
+      background: rgba(10, 158, 110, 0.05)
+    }
+
+    .apt-syl-list {
+      padding: 6px 14px 2px 48px
+    }
+
+    .apt-syl-item {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.74rem;
+      color: var(--text);
+      padding: 2px 0;
+      line-height: 1.5;
+      opacity: 0.85
+    }
+
+    .apt-syl-item::before {
+      content: '• ';
+      color: var(--accent)
+    }
+
+    .apt-group-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.61rem;
+      color: var(--muted);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 10px 14px 5px 48px;
+      display: flex;
+      align-items: center;
+      gap: 8px
+    }
+
+    .apt-group-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border)
+    }
+
+    .apt-sub-wrap {
+      border-bottom: 1px solid var(--border)
+    }
+
+    .apt-sub-wrap:last-child {
+      border-bottom: none
+    }
+
+    .apt-sub-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      padding: 7px 14px 7px 48px
+    }
+
+    .apt-sub-left {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      flex: 1;
+      cursor: pointer
+    }
+
+    .apt-sub-left:hover .apt-sub-cb {
+      border-color: var(--accent)
+    }
+
+    .apt-sub-cb {
+      width: 14px;
+      height: 14px;
+      border: 1.5px solid var(--muted);
+      border-radius: 3px;
+      flex-shrink: 0;
+      margin-top: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s
+    }
+
+    .apt-sub-cb.checked {
+      background: var(--accent);
+      border-color: var(--accent)
+    }
+
+    .apt-sub-cb.checked::after {
+      content: '✓';
+      font-size: 8px;
+      color: #000;
+      font-weight: 700
+    }
+
+    .apt-sub-label {
+      font-size: 0.82rem;
+      color: var(--text);
+      line-height: 1.5
+    }
+
+    .apt-sub-label.done {
+      text-decoration: line-through;
+      color: var(--muted)
+    }
+
+    .apt-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.58rem;
+      padding: 2px 6px;
+      border-radius: 4px;
+      white-space: nowrap;
+      flex-shrink: 0;
+      margin-top: 2px
+    }
+
+    .apt-tag.p {
+      background: rgba(123, 97, 255, 0.1);
+      color: var(--accent2);
+      border: 1px solid rgba(123, 97, 255, 0.2)
+    }
+
+    .apt-tag.q {
+      background: rgba(79, 255, 176, 0.07);
+      color: var(--accent);
+      border: 1px solid rgba(79, 255, 176, 0.2)
+    }
+
+    .apt-prog-wrap {
+      max-width: 860px;
+      margin: 0 auto 6px;
+      background: var(--border);
+      border-radius: 999px;
+      height: 6px;
+      overflow: hidden
+    }
+
+    .apt-prog-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #da77f2, #7b61ff);
+      border-radius: 999px;
+      transition: width 0.4s
+    }
+
+    .apt-prog-label {
+      text-align: center;
+      margin-bottom: 20px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--muted)
+    }
+
+    /* ── GITHUB ── */
+    .gh-badge {
+      position: fixed;
+      bottom: 22px;
+      right: 22px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 8px 13px;
+      text-decoration: none;
+      color: var(--text);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.73rem;
+      z-index: 50;
+      transition: border-color 0.2s, background 0.2s, transform 0.15s;
+      box-shadow: 0 4px 20px var(--shadow)
+    }
+
+    .gh-badge:hover {
+      border-color: var(--accent);
+      background: var(--surface2);
+      transform: translateY(-2px)
+    }
+
+    .gh-name {
+      color: var(--accent);
+      font-weight: 700;
+      letter-spacing: 0.5px
+    }
+
+    @media(max-width:580px) {
+
+      .topic-num,
+      .apt-topic-num,
+      .guide-topic-num {
+        display: none
+      }
+
+      .subtopic-row,
+      .add-sub-row,
+      .apt-sub-row,
+      .apt-group-label,
+      .apt-def,
+      .apt-syl-list,
+      .guide-body {
+        padding-left: 30px
+      }
+
+      .gh-badge {
+        bottom: 14px;
+        right: 14px;
+        padding: 6px 10px
+      }
+
+      .section-tab {
+        font-size: 0.72rem;
+        padding: 7px 6px
+      }
+    }
+
+    /* ══════════════════════════════════════════════════
+   GLOBAL NAV
+══════════════════════════════════════════════════ */
+    .top-nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 300;
+      display: flex;
+      align-items: center;
+      gap: 0;
+      padding: 0 20px;
+      height: 56px;
+      background: rgba(11, 13, 17, 0.85);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      transition: background 0.3s, border-color 0.3s;
+    }
+
+    [data-theme="light"] .top-nav {
+      background: rgba(240, 242, 247, 0.88)
+    }
+
+    .nav-logo {
+      font-family: 'Syne', sans-serif;
+      font-size: 0.88rem;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+      cursor: pointer;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-right: 8px;
+      white-space: nowrap;
+    }
+
+    .nav-divider {
+      width: 1px;
+      height: 20px;
+      background: var(--border);
+      margin: 0 12px;
+      flex-shrink: 0
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      flex: 1
+    }
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 8px;
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      font-family: 'Syne', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+
+    .nav-link:hover {
+      background: var(--surface2);
+      color: var(--text)
+    }
+
+    .nav-link.active {
+      background: var(--surface);
+      color: var(--text);
+      box-shadow: 0 1px 6px var(--shadow)
+    }
+
+    .nav-link .nl-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      flex-shrink: 0
+    }
+
+    .nav-dropdown {
+      position: relative
+    }
+
+    .nav-dropdown-menu {
+      display: none;
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 0;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      min-width: 180px;
+      padding: 6px;
+      box-shadow: 0 8px 32px var(--shadow);
+      z-index: 400;
+      animation: dropIn 0.15s ease;
+    }
+
+    @keyframes dropIn {
+      from {
+        opacity: 0;
+        transform: translateY(-6px)
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0)
+      }
+    }
+
+    .nav-dropdown:hover .nav-dropdown-menu {
+      display: block
+    }
+
+    .nav-dropdown-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 8px;
+      color: var(--text);
+      font-family: 'Syne', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.12s;
+      border: none;
+      background: transparent;
+      width: 100%;
+      text-align: left;
+    }
+
+    .nav-dropdown-item:hover {
+      background: var(--surface2)
+    }
+
+    .nav-dropdown-item .nl-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      flex-shrink: 0
+    }
+
+    .nav-arrow {
+      font-size: 0.6rem;
+      color: var(--muted);
+      margin-left: 2px;
+      transition: transform 0.15s
+    }
+
+    .nav-dropdown:hover .nav-arrow {
+      transform: rotate(180deg)
+    }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-left: auto
+    }
+
+    .nav-theme-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
+      font-size: 1rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      flex-shrink: 0;
+    }
+
+    .nav-theme-btn:hover {
+      border-color: var(--accent);
+      background: var(--surface2)
+    }
+
+    /* page wrapper - accounts for fixed nav */
+    .page-wrap {
+      padding-top: 56px;
+      min-height: 100vh
+    }
+
+    /* inner page padding */
+    .inner-page {
+      padding: 28px 20px 100px
+    }
+
+    /* ══════════════════════════════════════════════════
+   HOME PAGE
+══════════════════════════════════════════════════ */
+    #homePage {
+      display: none
+    }
+
+    #homePage.active {
+      display: block
+    }
+
+    .hero {
+      min-height: calc(100vh - 56px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 40px 20px 80px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* animated bg grid */
+    .hero-grid {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(var(--border) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border) 1px, transparent 1px);
+      background-size: 40px 40px;
+      mask-image: radial-gradient(ellipse 80% 70% at 50% 50%, black 40%, transparent 100%);
+      -webkit-mask-image: radial-gradient(ellipse 80% 70% at 50% 50%, black 40%, transparent 100%);
+      animation: gridPulse 8s ease-in-out infinite;
+    }
+
+    @keyframes gridPulse {
+
+      0%,
+      100% {
+        opacity: 0.3
+      }
+
+      50% {
+        opacity: 0.6
+      }
+    }
+
+    /* floating orbs */
+    .hero-orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      pointer-events: none;
+      animation: orbFloat 10s ease-in-out infinite;
+    }
+
+    .hero-orb-1 {
+      width: 400px;
+      height: 400px;
+      background: rgba(79, 255, 176, 0.07);
+      top: -80px;
+      left: -100px;
+      animation-delay: 0s
+    }
+
+    .hero-orb-2 {
+      width: 350px;
+      height: 350px;
+      background: rgba(123, 97, 255, 0.08);
+      bottom: -60px;
+      right: -80px;
+      animation-delay: -4s
+    }
+
+    .hero-orb-3 {
+      width: 250px;
+      height: 250px;
+      background: rgba(255, 161, 22, 0.05);
+      top: 40%;
+      left: 60%;
+      animation-delay: -7s
+    }
+
+    @keyframes orbFloat {
+
+      0%,
+      100% {
+        transform: translate(0, 0) scale(1)
+      }
+
+      33% {
+        transform: translate(20px, -30px) scale(1.05)
+      }
+
+      66% {
+        transform: translate(-15px, 20px) scale(0.97)
+      }
+    }
+
+    [data-theme="light"] .hero-orb-1 {
+      background: rgba(10, 158, 110, 0.08)
+    }
+
+    [data-theme="light"] .hero-orb-2 {
+      background: rgba(91, 63, 196, 0.08)
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 16px;
+      border-radius: 999px;
+      background: rgba(79, 255, 176, 0.08);
+      border: 1px solid rgba(79, 255, 176, 0.2);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--accent);
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      margin-bottom: 28px;
+      animation: fadeInUp 0.7s ease both;
+    }
+
+    [data-theme="light"] .hero-badge {
+      background: rgba(10, 158, 110, 0.08);
+      border-color: rgba(10, 158, 110, 0.25)
+    }
+
+    .hero-badge-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      animation: blink 2s ease-in-out infinite
+    }
+
+    @keyframes blink {
+
+      0%,
+      100% {
+        opacity: 1
+      }
+
+      50% {
+        opacity: 0.3
+      }
+    }
+
+    .hero-title {
+      font-size: clamp(2.4rem, 7vw, 5.5rem);
+      font-weight: 800;
+      letter-spacing: -2px;
+      line-height: 1.05;
+      margin-bottom: 20px;
+      animation: fadeInUp 0.7s 0.1s ease both;
+    }
+
+    .hero-title-line1 {
+      display: block;
+      color: var(--text)
+    }
+
+    .hero-title-line2 {
+      display: block;
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 60%, #ff6b6b 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-sub {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.9rem;
+      color: var(--muted);
+      max-width: 520px;
+      line-height: 1.7;
+      margin-bottom: 48px;
+      animation: fadeInUp 0.7s 0.2s ease both;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(24px)
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0)
+      }
+    }
+
+    /* stats row */
+    .hero-stats {
+      display: flex;
+      gap: 32px;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 56px;
+      animation: fadeInUp 0.7s 0.3s ease both;
+    }
+
+    .hero-stat {
+      text-align: center
+    }
+
+    .hero-stat-num {
+      font-size: 2rem;
+      font-weight: 800;
+      letter-spacing: -1px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-stat-lbl {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.65rem;
+      color: var(--muted);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-top: 2px
+    }
+
+    .hero-stat-sep {
+      width: 1px;
+      height: 36px;
+      background: var(--border)
+    }
+
+    /* cards */
+    .hero-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+      max-width: 900px;
+      width: 100%;
+      animation: fadeInUp 0.7s 0.4s ease both;
+    }
+
+    .hero-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 28px 24px;
+      text-align: left;
+      cursor: pointer;
+      transition: transform 0.22s, border-color 0.22s, box-shadow 0.22s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, var(--card-color, var(--accent)) 0%, transparent 60%);
+      opacity: 0;
+      transition: opacity 0.22s;
+      border-radius: 18px;
+    }
+
+    .hero-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--card-color, var(--accent));
+      box-shadow: 0 12px 40px var(--shadow)
+    }
+
+    .hero-card:hover::before {
+      opacity: 0.04
+    }
+
+    .hero-card-icon {
+      font-size: 2rem;
+      margin-bottom: 14px;
+      display: block
+    }
+
+    .hero-card-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.62rem;
+      color: var(--muted);
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      margin-bottom: 6px
+    }
+
+    .hero-card-title {
+      font-size: 1.25rem;
+      font-weight: 800;
+      margin-bottom: 8px;
+      color: var(--text)
+    }
+
+    .hero-card-desc {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.74rem;
+      color: var(--muted);
+      line-height: 1.6
+    }
+
+    .hero-card-arrow {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      color: var(--muted);
+      transition: all 0.2s;
+    }
+
+    .hero-card:hover .hero-card-arrow {
+      background: var(--card-color, var(--accent));
+      color: #000;
+      border-color: transparent
+    }
+
+    /* DSA sub-cards */
+    .hero-card-subs {
+      display: flex;
+      gap: 8px;
+      margin-top: 16px
+    }
+
+    .hero-card-sub {
+      flex: 1;
+      padding: 10px 12px;
+      border-radius: 10px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.15s;
+      text-align: center;
+    }
+
+    .hero-card-sub:hover {
+      border-color: var(--card-color, var(--accent));
+      color: var(--text)
+    }
+
+    /* scroll hint */
+    .hero-scroll {
+      position: absolute;
+      bottom: 28px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.62rem;
+      color: var(--muted);
+      letter-spacing: 1px;
+      opacity: 0.6;
+      animation: bounce 2s ease-in-out infinite;
+    }
+
+    @keyframes bounce {
+
+      0%,
+      100% {
+        transform: translateX(-50%) translateY(0)
+      }
+
+      50% {
+        transform: translateX(-50%) translateY(6px)
+      }
+    }
+
+    /* ══════════════════════════════════════════════════
+   INNER PAGE HEADER
+══════════════════════════════════════════════════ */
+    .page-header {
+      max-width: 860px;
+      margin: 0 auto 28px;
+      padding: 32px 0 0;
+      text-align: center;
+    }
+
+    .page-header h1 {
+      font-size: clamp(1.8rem, 4vw, 3rem);
+      font-weight: 800;
+      letter-spacing: -1px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1.1;
+    }
+
+    .page-header p {
+      margin-top: 8px;
+      color: var(--muted);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      letter-spacing: 1px
+    }
+
+    /* hide old theme toggle - nav has it now */
+    .theme-toggle {
+      display: none
+    }
+
+    /* section tabs become hidden - nav replaces them */
+    .section-tabs {
+      display: none
+    }
+
+    /* all section pages */
+    .app-section {
+      display: none;
+      min-height: calc(100vh - 56px)
+    }
+
+    .app-section.active {
+      display: block
+    }
+  </style>
+</head>
+
+<body>
+  <div class="page-wrap">
+
+    <!-- ── GLOBAL NAV ── -->
+    <nav class="top-nav">
+      <span class="nav-logo" onclick="goHome()">CS Engineering Guide</span>
+      <div class="nav-divider"></div>
+      <div class="nav-links">
+        <button class="nav-link" id="navHome" onclick="goHome()">
+          <span>🏠</span> Home
+        </button>
+
+        <button class="nav-link" id="navDSA" onclick="goSection('dsa')">
+          <span class="nl-dot" style="background:#4fffb0"></span> DSA Roadmap
+        </button>
+        <button class="nav-link" id="navGuide" onclick="goSection('guide')">
+          <span class="nl-dot" style="background:#ffa94d"></span> Topic Guide
+        </button>
+
+        <button class="nav-link" id="navApt" onclick="goSection('apt')">
+          <span class="nl-dot" style="background:#da77f2"></span> Aptitude
+        </button>
+      </div>
+
+      <div class="nav-right">
+        <button class="nav-theme-btn" id="themeToggle" onclick="toggleTheme()" title="Toggle theme">🌙</button>
+      </div>
+    </nav>
+
+    <!-- ══════════════════════════════════════════
+     HOME PAGE
+══════════════════════════════════════════ -->
+    <div id="homePage" class="app-section active">
+      <div class="hero">
+        <div class="hero-grid"></div>
+        <div class="hero-orb hero-orb-1"></div>
+        <div class="hero-orb hero-orb-2"></div>
+        <div class="hero-orb hero-orb-3"></div>
+
+        <div class="hero-badge">
+          <span class="hero-badge-dot"></span>
+          Computer Science Engineering
+        </div>
+
+        <h1 class="hero-title">
+          <span class="hero-title-line1">Your Complete</span>
+          <span class="hero-title-line2">CS Study Guide</span>
+        </h1>
+
+        <p class="hero-sub">
+          Structured roadmaps, topic recognition guides, and aptitude prep — everything you need to land that
+          internship.
+        </p>
+
+        <div class="hero-stats">
+          <div class="hero-stat">
+            <div class="hero-stat-num">31</div>
+            <div class="hero-stat-lbl">DSA Topics</div>
+          </div>
+          <div class="hero-stat-sep"></div>
+          <div class="hero-stat">
+            <div class="hero-stat-num">5</div>
+            <div class="hero-stat-lbl">DSA Phases</div>
+          </div>
+          <div class="hero-stat-sep"></div>
+          <div class="hero-stat">
+            <div class="hero-stat-num">68</div>
+            <div class="hero-stat-lbl">Aptitude Topics</div>
+          </div>
+          <div class="hero-stat-sep"></div>
+          <div class="hero-stat">
+            <div class="hero-stat-num">3</div>
+            <div class="hero-stat-lbl">Apt Sections</div>
+          </div>
+        </div>
+
+        <div class="hero-cards">
+          <!-- DSA Card -->
+          <div class="hero-card" style="--card-color:#4fffb0" onclick="goSection('dsa')">
+            <span class="hero-card-icon">⚡</span>
+            <div class="hero-card-label">Data Structures & Algorithms</div>
+            <div class="hero-card-title">DSA Roadmap</div>
+            <div class="hero-card-desc">31 topics across 5 phases. Track progress, add notes, link LeetCode problems.
+            </div>
+            <div class="hero-card-subs">
+              <div class="hero-card-sub" onclick="event.stopPropagation();goSection('dsa')">📋 Roadmap</div>
+              <div class="hero-card-sub" onclick="event.stopPropagation();goSection('guide')">🔍 Topic Guide</div>
+            </div>
+            <div class="hero-card-arrow" onclick="goSection('dsa')">→</div>
+          </div>
+
+          <!-- Aptitude Card -->
+          <div class="hero-card" style="--card-color:#da77f2" onclick="goSection('apt')">
+            <span class="hero-card-icon">🧮</span>
+            <div class="hero-card-label">Placement Prep</div>
+            <div class="hero-card-title">Aptitude Guide</div>
+            <div class="hero-card-desc">Quant, Logical & Verbal. Phased learning with syllabus, patterns & question
+              types.</div>
+            <div class="hero-card-arrow">→</div>
+          </div>
+        </div>
+
+        <div class="hero-scroll">
+          <span>scroll to explore</span>
+          <span>↓</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════
+     DSA ROADMAP
+══════════════════════════════════════════ -->
+    <div id="dsaSection" class="app-section">
+      <div class="inner-page">
+        <div class="page-header">
+          <h1>DSA Roadmap</h1>
+          <p>// track your progress · <span id="topicCount">31</span> topics</p>
+          <div class="prog-wrap" style="margin-top:14px">
+            <div class="prog-fill" id="progressFill"></div>
+          </div>
+          <div class="prog-label" id="progressLabel">0 / 0 subtopics completed</div>
+        </div>
+        <div class="deadline-banner" id="deadlineBanner">
+          <div class="deadline-top">
+            <span class="deadline-label">🎯 Target Date</span>
+            <input type="date" class="deadline-input" id="deadlineInput" onchange="setDeadline(this.value)">
+            <button class="dl-clear" id="dlClear" onclick="clearDeadline()" style="display:none">✕ Clear</button>
+          </div>
+          <div id="pacingGrid" style="display:none" class="pacing-grid"></div>
+        </div>
+        <div class="container" id="app"></div>
+        <div class="bottom-actions">
+          <button class="bottom-btn" onclick="resetProgress()">↺ Reset Progress Only</button>
+          <button class="bottom-btn" onclick="resetAll()">⚠ Reset Everything</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════
+     APTITUDE
+══════════════════════════════════════════ -->
+    <div id="aptSection" class="app-section">
+      <div class="inner-page">
+        <div class="page-header">
+          <h1>Aptitude Guide</h1>
+          <p>// quantitative · logical · verbal</p>
+          <div class="apt-prog-wrap" style="margin-top:14px">
+            <div class="apt-prog-fill" id="aptProgFill"></div>
+          </div>
+          <div class="apt-prog-label" id="aptProgLabel">0 / 0 items completed</div>
+        </div>
+        <div class="container" id="aptApp"></div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════
+     TOPIC GUIDE
+══════════════════════════════════════════ -->
+    <div id="guideSection" class="app-section">
+      <div class="inner-page">
+        <div class="page-header">
+          <h1>Topic Identifier Guide</h1>
+          <p>// how to recognise which topic a problem belongs to</p>
+        </div>
+        <div class="container" id="guideApp"></div>
+      </div>
+    </div>
+
+    <!-- MODAL -->
+    <div class="modal-overlay" id="modalOverlay">
+      <div class="modal">
+        <h3 id="modalMsg">Are you sure?</h3>
+        <div class="modal-actions">
+          <button class="modal-cancel" onclick="closeModal()">Cancel</button>
+          <button class="modal-confirm" id="modalConfirmBtn">Confirm</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- NOTE DRAWER -->
+    <div class="note-overlay" id="noteOverlay" onclick="closeNoteDrawer(event)">
+      <div class="note-drawer" onclick="event.stopPropagation()">
+        <div class="note-drawer-handle"></div>
+        <div class="note-drawer-header">
+          <div class="note-drawer-title">
+            <div class="note-drawer-topic" id="ndTopic"></div>
+            <div class="note-drawer-sub" id="ndSub"></div>
+          </div>
+          <button class="note-drawer-close" onclick="closeNoteDrawer()">&#x2715;</button>
+        </div>
+        <div class="note-drawer-body">
+          <div>
+            <div class="nd-section-label">LeetCode Problems</div>
+            <div class="lc-chips" id="ndChips"></div>
+            <div class="lc-add-row">
+              <span class="lc-badge">LC #</span>
+              <input class="nd-input" id="ndLcInput" type="text" placeholder="Problem number or URL, press Enter"
+                onkeydown="if(event.key==='Enter') ndAddLC()">
+              <button class="nd-btn" onclick="ndAddLC()">Add</button>
+            </div>
+          </div>
+          <div>
+            <div class="nd-section-label">Notes</div>
+            <div class="nd-toolbar">
+              <div class="nd-tb-group">
+                <select class="nd-tb-select" onchange="ndExecFontSize(this.value)">
+                  <option value="">Size</option>
+                  <option value="1">Small</option>
+                  <option value="3">Normal</option>
+                  <option value="4">Large</option>
+                  <option value="5">XL</option>
+                </select>
+              </div>
+              <div class="nd-tb-group">
+                <select class="nd-tb-select" onchange="ndExecHeading(this.value)">
+                  <option value="">Style</option>
+                  <option value="h1">H1</option>
+                  <option value="h2">H2</option>
+                  <option value="h3">H3</option>
+                  <option value="p">Normal</option>
+                </select>
+              </div>
+              <div class="nd-tb-group">
+                <button class="nd-tb-btn" id="tbBold" onclick="ndCmd('bold')"><b>B</b></button>
+                <button class="nd-tb-btn" id="tbItalic" onclick="ndCmd('italic')"><i>I</i></button>
+                <button class="nd-tb-btn" id="tbUnder" onclick="ndCmd('underline')"><u>U</u></button>
+                <button class="nd-tb-btn" id="tbStrike" onclick="ndCmd('strikeThrough')"><s>S</s></button>
+              </div>
+              <div class="nd-tb-group">
+                <button class="nd-tb-btn" onclick="ndHighlight()" style="color:#fde68a">▐</button>
+                <div class="nd-color-row">
+                  <div class="nd-color-dot" style="background:#dde3f0" onclick="ndCmd('foreColor','#dde3f0')"></div>
+                  <div class="nd-color-dot" style="background:#4fffb0" onclick="ndCmd('foreColor','#4fffb0')"></div>
+                  <div class="nd-color-dot" style="background:#7b61ff" onclick="ndCmd('foreColor','#7b61ff')"></div>
+                  <div class="nd-color-dot" style="background:#ffa94d" onclick="ndCmd('foreColor','#ffa94d')"></div>
+                  <div class="nd-color-dot" style="background:#ff6b6b" onclick="ndCmd('foreColor','#ff6b6b')"></div>
+                  <div class="nd-color-dot" style="background:#4dabf7" onclick="ndCmd('foreColor','#4dabf7')"></div>
+                </div>
+              </div>
+              <div class="nd-tb-group">
+                <button class="nd-tb-btn" onclick="ndCmd('insertUnorderedList')">&#8226;</button>
+                <button class="nd-tb-btn" onclick="ndCmd('insertOrderedList')">1.</button>
+              </div>
+              <div class="nd-tb-group">
+                <button class="nd-tb-btn" onclick="ndInlineCode()"
+                  style="color:var(--accent);font-size:0.7rem">&lt;/&gt;</button>
+                <button class="nd-tb-btn" onclick="ndBlockquote()">&ldquo;</button>
+                <button class="nd-tb-btn" onclick="ndHr()" style="font-size:0.65rem">&#8213;</button>
+              </div>
+              <div class="nd-tb-group">
+                <button class="nd-tb-btn" onclick="ndCmd('removeFormat')" style="font-size:0.65rem">&#10006;fmt</button>
+              </div>
+            </div>
+            <div class="nd-editor" id="ndNoteArea" contenteditable="true"
+              data-placeholder="Write your notes here — key insight, approach, patterns, edge cases…"
+              oninput="ndAutoSave();ndUpdateToolbarState()" onkeyup="ndUpdateToolbarState()"
+              onmouseup="ndUpdateToolbarState()" onkeydown="ndEditorKeydown(event)"></div>
+            <div class="nd-save-status" id="ndSaveStatus">start typing to save</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- GITHUB BADGE -->
+    <a class="gh-badge" href="https://github.com/SamantD7" target="_blank" rel="noopener">
+      <svg width="15" height="15" viewBox="0 0 98 96" fill="currentColor">
+        <path fill-rule="evenodd" clip-rule="evenodd"
+          d="M48.854 0C21.839 0 0 22 0 49.217c0 21.756 13.993 40.172 33.405 46.69 2.427.49 3.316-1.059 3.316-2.362 0-1.141-.08-5.052-.08-9.127-13.59 2.934-16.42-5.867-16.42-5.867-2.184-5.704-5.42-7.17-5.42-7.17-4.448-3.015.324-3.015.324-3.015 4.934.326 7.523 5.052 7.523 5.052 4.367 7.496 11.404 5.378 14.235 4.074.404-3.178 1.699-5.378 3.074-6.6-10.839-1.141-22.243-5.378-22.243-24.283 0-5.378 1.94-9.778 5.014-13.2-.485-1.222-2.184-6.275.486-13.038 0 0 4.125-1.304 13.426 5.052a46.97 46.97 0 0 1 12.214-1.63c4.125 0 8.33.571 12.213 1.63 9.302-6.356 13.427-5.052 13.427-5.052 2.67 6.763.97 11.816.485 13.038 3.155 3.422 5.015 7.822 5.015 13.2 0 18.905-11.404 23.06-22.324 24.283 1.78 1.548 3.316 4.481 3.316 9.126 0 6.6-.08 11.897-.08 13.526 0 1.304.89 2.853 3.316 2.364 19.412-6.52 33.405-24.935 33.405-46.691C97.707 22 75.788 0 48.854 0z" />
+      </svg>
+      <span class="gh-name">SamantD7</span>
+    </a>
+
+    <script>
+      // ═══════════════════════════════════════════════════
+      // HELPERS
+      // ═══════════════════════════════════════════════════
+      function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+      function ps(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch { } }
+      function ld(k, d) { try { const r = localStorage.getItem(k); return r ? JSON.parse(r) : d; } catch { return d; } }
+
+      // ═══════════════════════════════════════════════════
+      // THEME
+      // ═══════════════════════════════════════════════════
+      let currentTheme = ld('theme_v1', 'dark');
+      function applyTheme(t) {
+        document.documentElement.setAttribute('data-theme', t);
+        const btn = document.getElementById('themeToggle');
+        if (btn) btn.textContent = t === 'dark' ? '🌙' : '☀️';
+        currentTheme = t; ps('theme_v1', t);
+      }
+      function toggleTheme() { applyTheme(currentTheme === 'dark' ? 'light' : 'dark'); }
+      applyTheme(currentTheme);
+
+      // ═══════════════════════════════════════════════════
+      // NAVIGATION
+      // ═══════════════════════════════════════════════════
+      const PAGES = ['home', 'dsa', 'apt', 'guide'];
+      let currentPage = 'home';
+
+      function goHome() {
+        showPage('home');
+      }
+
+      function goSection(sec) {
+        showPage(sec);
+        if (sec === 'apt') renderApt();
+        if (sec === 'guide') renderGuide();
+      }
+
+      function showPage(page) {
+        currentPage = page;
+        // Hide all pages explicitly
+        PAGES.forEach(p => {
+          const id = p === 'home' ? 'homePage' : p + 'Section';
+          const el = document.getElementById(id);
+          if (el) { el.classList.remove('active'); el.style.display = 'none'; }
+        });
+        // Show target
+        const targetId = page === 'home' ? 'homePage' : page + 'Section';
+        const target = document.getElementById(targetId);
+        if (target) { target.classList.add('active'); target.style.display = 'block'; }
+        // DSA page: trigger render after it becomes visible
+        if (page === 'dsa') { setTimeout(() => { render(); renderDeadline(); }, 10); }
+        updateNavHighlights(page);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+
+      function updateNavHighlights(page) {
+        const map = { navHome: 'home', navDSA: 'dsa', navGuide: 'guide', navApt: 'apt' };
+        Object.entries(map).forEach(([id, p]) => {
+          const el = document.getElementById(id);
+          if (el) el.classList.toggle('active', page === p);
+        });
+      }
+
+      // legacy shim — keep for any old inline onclick that calls switchSection
+      function switchSection(sec) { goSection(sec); }
+
+
+      // ═══════════════════════════════════════════════════
+      // DSA DATA
+      // ═══════════════════════════════════════════════════
+      const DEFAULT_DATA = [
+        {
+          phase: "PHASE 1", title: "Foundations", color: "#ff6b6b", topics: [
+            { id: "t1", name: "Arrays & Strings", subs: ["Static vs Dynamic Arrays — fixed-size vs resizable arrays, memory layout, cache efficiency", "In-place operations — modifying array without extra space (reversal, rotation)", "Kadane's Algorithm — max subarray sum in O(n) using local/global max tracking", "Dutch National Flag — 3-way partition for 0s, 1s, 2s in one pass", "Array Rotation — left/right rotation using reversal trick in O(n)", "String immutability — why strings behave differently from arrays in Java/Python", "Character frequency — using arrays of size 26 instead of hashmaps for lowercase strings", "Anagram & palindrome checks — sorting vs frequency counting approaches", "String matching (naive) — brute force O(n×m) before learning KMP later"] },
+            { id: "t2", name: "Hashing", subs: ["HashMap internals — hash function, buckets, chaining, load factor, rehashing", "Collision handling — chaining vs open addressing", "HashSet usage — O(1) lookup for existence checks", "Frequency maps — counting occurrences of elements", "Index mapping — storing first/last seen index of elements", "Custom hashing — hashing pairs, tuples, strings as keys"] },
+            { id: "t3", name: "Two Pointers", subs: ["Opposite end pointers — start and end moving inward (pair sum, container with most water)", "Same direction pointers — slow/fast pointers for in-place operations", "Partitioning — Dutch flag, segregation problems", "Three sum / k-sum — fixing one element, two-pointer for the rest"] },
+            { id: "t4", name: "Sliding Window", subs: ["Fixed size window — max/min/sum in window of size k", "Variable size window — expand/shrink based on condition (longest substring without repeat)", "Window with hashmaps — tracking character/element counts inside window", "At most k / exactly k trick — converting exact count problems to at-most"] },
+            { id: "t5", name: "Prefix Sum & Difference Arrays", subs: ["1D prefix sum — range sum queries in O(1) after O(n) build", "2D prefix sum — submatrix sum queries in O(1)", "Difference array — range update in O(1), reconstruct in O(n)", "Prefix XOR — subarray XOR queries", "Count of subarrays with given sum — prefix sum + hashmap trick"] },
+            { id: "t6", name: "Bit Manipulation", subs: ["Binary representation — how integers are stored in binary, signed vs unsigned", "Basic bitwise operators — AND, OR, XOR, NOT and their truth tables", "Left & right shift — multiplying/dividing by powers of 2 using shifts", "Set, clear, toggle a bit — standard mask operations on individual bits", "Check if bit is set — using n & (1 << i) to read a specific bit position", "Power of 2 check — n & (n-1) == 0 trick to check in O(1)", "Count set bits (Hamming weight) — Brian Kernighan's algorithm, built-in __builtin_popcount", "XOR properties — a^a=0, a^0=a, used for finding unique elements", "Bit masking for subsets — representing and iterating all subsets of a set using bits", "Two's complement — how negative numbers work in binary, why -n = ~n + 1"] },
+            { id: "t7", name: "Sorting", subs: ["Bubble, Selection, Insertion — O(n²) sorts, when they're useful (nearly sorted input)", "Merge Sort — divide & conquer, stable, O(n log n), basis for inversion count", "Quick Sort — pivot partitioning, average O(n log n), worst O(n²), in-place", "Counting Sort — O(n+k) for bounded integers", "Radix Sort — sort digit by digit for large integers", "Custom comparators — sorting by second element, structs, lambda functions", "Inversion count — modified merge sort to count pairs where arr[i] > arr[j], i < j"] },
+            { id: "t8", name: "Binary Search", subs: ["Classic binary search — searching in sorted array, lo/hi/mid logic", "Lower bound / Upper bound — first occurrence, last occurrence, count", "Binary search on answer — when answer has monotone property (search space is a range, not array)", "Rotated sorted array — finding pivot, searching in rotated arrays", "Binary search on floats — for problems needing precision answers", "2D binary search — searching in row-wise/col-wise sorted matrix"] },
+            { id: "t31", name: "Line Sweep", subs: ["Sweep line concept — imaginary vertical line moves left to right across events, processing them in sorted order", "Event-based sorting — convert geometry/interval problems into discrete events sorted by x-coordinate or value", "Interval overlap detection — use sweep to find if any two intervals overlap in O(n log n)", "Meeting rooms pattern — count maximum simultaneous overlapping intervals using start/end events", "Area of union of rectangles — sweep vertical line, track active y-intervals to compute covered area", "Skyline problem — process building edges as events, use max-heap or multiset to track current height", "Coordinate compression — compress sparse coordinates to dense indices before sweeping", "Difference array + sweep — apply range updates as +1/-1 events, sweep to reconstruct values"] }
+          ]
+        },
+        {
+          phase: "PHASE 2", title: "Core Data Structures", color: "#ffa94d", topics: [
+            { id: "t9", name: "Linked List", subs: ["Singly linked list — node structure, traversal, insertion, deletion", "Doubly linked list — prev pointer, O(1) deletion given node reference", "Circular linked list — no null tail, use in round-robin scheduling", "Floyd's Cycle Detection — slow/fast pointer to detect and find cycle start", "Reversal — iterative and recursive reversal of full/partial list", "Merge two sorted lists — pointer manipulation without extra space", "Dummy node trick — simplifies edge cases at head during insertion/deletion"] },
+            { id: "t10", name: "Stacks", subs: ["Stack using array/linked list — push, pop, peek in O(1)", "Monotonic stack — maintaining increasing/decreasing order for next greater/smaller element", "Stack for expression evaluation — infix to postfix, balanced parentheses", "Min stack — O(1) getMin with auxiliary stack or encoding trick", "Histogram problems — largest rectangle using stack"] },
+            { id: "t11", name: "Queues & Deques", subs: ["Queue using array/linked list — FIFO, circular queue", "Queue using two stacks — amortized O(1) enqueue/dequeue", "Deque (double-ended queue) — insert/delete from both ends", "Sliding window maximum — monotonic deque to get max in O(1) per window", "BFS queue usage — level-order traversal and shortest path"] },
+            { id: "t12", name: "Heaps & Priority Queues", subs: ["Binary heap structure — complete binary tree stored in array, parent-child index formula", "Min-heap / Max-heap — heapify up and down operations", "Heap sort — build heap O(n), extract O(n log n)", "K-th largest/smallest — min-heap of size k trick", "Merge k sorted lists — min-heap with (value, list_index) tuples", "Top-K frequent elements — frequency map + heap", "Median of stream — two heaps (max-heap for lower half, min-heap for upper half)"] },
+            { id: "t13", name: "Recursion & Backtracking", subs: ["Recursion fundamentals — base case, recursive case, call stack visualization", "Tree of recursion — understanding branching factor and depth", "Backtracking template — choose → explore → unchoose pattern", "Subsets & permutations — generating all combinations with/without repetition", "Constraint satisfaction — N-Queens, Sudoku, Word Search", "Pruning — cutting branches early to reduce time"] },
+            { id: "t14", name: "Trees", subs: ["Binary tree representation — node structure, left/right child", "Tree traversals — inorder, preorder, postorder (recursive + iterative)", "Level-order traversal — BFS using queue, level-by-level processing", "BST properties — left < root < right, inorder gives sorted order", "BST operations — insert, delete (3 cases), search in O(h)", "Height, diameter, balance — recursive definitions and calculations", "LCA (Lowest Common Ancestor) — brute path comparison vs single-pass recursion", "Views of a tree — left view, right view, top view, bottom view", "Morris Traversal — O(1) space inorder traversal using thread pointers"] }
+          ]
+        },
+        {
+          phase: "PHASE 3", title: "Intermediate Algorithms", color: "#4dabf7", topics: [
+            { id: "t15", name: "Greedy", subs: ["Greedy choice property — locally optimal choice leads to global optimum", "Activity selection / Interval scheduling — sort by end time, pick non-overlapping", "Interval merging — sort by start, merge overlapping intervals", "Jump Game — track farthest reachable index", "Huffman encoding — min-heap based variable-length coding", "Fractional Knapsack — sort by value/weight ratio"] },
+            { id: "t16", name: "Divide & Conquer", subs: ["Merge sort pattern — split → solve → merge", "Quick select — find k-th smallest in O(n) average using partitioning", "Power function — fast exponentiation in O(log n)", "Closest pair of points — geometric D&C problem", "Matrix exponentiation — repeated matrix multiplication in O(log n) for Fibonacci etc."] },
+            { id: "t17", name: "Dynamic Programming — 1D", subs: ["Memoization vs Tabulation — top-down vs bottom-up approaches", "State definition — what dp[i] represents is the entire problem", "Fibonacci pattern — dp[i] = dp[i-1] + dp[i-2] family", "House robber pattern — non-adjacent selection", "Coin change — minimum coins, number of ways", "Climbing stairs variations — jump game, frog jump"] },
+            { id: "t18", name: "Dynamic Programming — 2D / Grid", subs: ["Grid paths — count paths from top-left to bottom-right with obstacles", "Minimum path sum — dp[i][j] = min(dp[i-1][j], dp[i][j-1]) + grid[i][j]", "0/1 Knapsack — include/exclude item, dp[i][w] table", "Subset sum — boolean dp table", "Unbounded Knapsack — items can be reused (coin change, rod cutting)"] },
+            { id: "t19", name: "DP on Strings", subs: ["Longest Common Subsequence (LCS) — 2D dp, basis for many string problems", "Longest Common Substring — LCS variant with reset on mismatch", "Edit Distance — min insert/delete/replace to convert one string to another", "Palindrome DP — longest palindromic subsequence/substring", "String matching DP — wildcard matching, regex matching"] }
+          ]
+        },
+        {
+          phase: "PHASE 4", title: "Graphs", color: "#69db7c", topics: [
+            { id: "t20", name: "Graph Representation & Traversal", subs: ["Adjacency matrix vs list — space/time tradeoffs", "BFS — queue-based, finds shortest path in unweighted graph", "DFS — stack/recursion-based, finds connected components, paths", "Flood fill — DFS/BFS on 2D grid (number of islands pattern)", "Bipartite check — 2-coloring using BFS"] },
+            { id: "t21", name: "Topological Sort", subs: ["Kahn's algorithm — BFS-based, use indegree array + queue", "DFS-based topo sort — postorder DFS, push to stack on finish", "Cycle detection in directed graph — topo sort fails if cycle exists (Kahn's won't process all nodes)", "Course schedule pattern — prerequisite problems map to topo sort"] },
+            { id: "t22", name: "Shortest Path", subs: ["Dijkstra — min-heap + relaxation, O((V+E) log V), only non-negative weights", "Bellman-Ford — relax all edges V-1 times, detects negative cycles, O(VE)", "Floyd-Warshall — all-pairs shortest path, O(V³) DP", "0-1 BFS — deque-based BFS when edge weights are only 0 or 1", "Multi-source BFS — start BFS from multiple sources simultaneously (walls/gates)"] },
+            { id: "t23", name: "Union-Find (DSU)", subs: ["Union by rank — attach smaller tree under larger to keep height low", "Path compression — flatten tree during find for near O(1) amortized", "Cycle detection in undirected graph — if both nodes same component before union → cycle", "Connected components — count distinct roots after all unions", "Dynamic connectivity — grouping problems (accounts merge, similar strings)"] },
+            { id: "t24", name: "Minimum Spanning Tree", subs: ["Kruskal's — sort edges by weight, union-find to avoid cycles", "Prim's — min-heap, greedily add minimum edge from visited set", "Cut property — minimum edge crossing a cut must be in MST (correctness proof)"] },
+            { id: "t25", name: "Advanced Graph", subs: ["Bridges & Articulation Points — Tarjan's DFS with discovery/low time", "Strongly Connected Components — Kosaraju's or Tarjan's SCC", "Euler path/circuit — Hierholzer's algorithm, all edges traversed once"] }
+          ]
+        },
+        {
+          phase: "PHASE 5", title: "Advanced", color: "#da77f2", topics: [
+            { id: "t26", name: "Tries", subs: ["Trie node structure — children array of size 26, isEnd flag", "Insert & Search — character by character traversal", "Prefix search (startsWith) — autocomplete pattern", "Word search in grid — DFS + Trie to prune branches early", "XOR Trie — binary trie to find max XOR pair in array"] },
+            { id: "t27", name: "Segment Trees & BIT", subs: ["Segment tree build — O(n) build, range query in O(log n)", "Point update — update leaf, propagate up", "Lazy propagation — deferred range updates in O(log n)", "Fenwick Tree (BIT) — simpler range sum/prefix sum with updates, O(log n)", "2D BIT — range sum queries on 2D grids"] },
+            { id: "t28", name: "Advanced DP", subs: ["Bitmask DP — state includes a bitmask representing subset (TSP, assignment)", "Digit DP — count numbers with property in range [L, R], digit by digit", "DP on trees — rerooting technique, subtree DP", "SOS DP (Sum over Subsets) — iterate over all subsets of a mask efficiently"] },
+            { id: "t29", name: "String Algorithms", subs: ["KMP — failure function to avoid redundant comparisons, O(n+m)", "Z-algorithm — Z-array gives longest prefix match at every position, O(n)", "Rabin-Karp — rolling hash for pattern matching, O(n+m) average", "Manacher's Algorithm — longest palindromic substring in O(n)", "Suffix Arrays — sorted suffixes for advanced string queries"] },
+            { id: "t30", name: "Math & Number Theory", subs: ["GCD & LCM — Euclidean algorithm, LCM = a×b/GCD", "Sieve of Eratosthenes — all primes up to N in O(n log log n)", "Modular arithmetic — (a+b) % m, (a×b) % m, Fermat's little theorem", "Modular inverse — for division under modulo", "Fast exponentiation — binary exponentiation in O(log n)", "Combinatorics — nCr with Pascal's triangle or modular inverse"] }
+          ]
+        }
+      ];
+
+      // ═══════════════════════════════════════════════════
+      // APTITUDE DATA
+      // ═══════════════════════════════════════════════════
+      const APT_DATA = [
+        {
+          sec: "Quantitative", color: "#da77f2", phases: [
+            {
+              label: "Phase 1 — Foundation", topics: [
+                { n: 1, t: "Numbers", s: "Types, properties, operations", def: "Numbers are the basic building blocks of mathematics. This topic covers classification of numbers, their properties, and arithmetic operations used across all aptitude topics.", syl: ["Natural, whole, integers, rational, irrational, real numbers", "Even, odd, prime, composite numbers", "Divisibility rules (2,3,4,5,6,7,8,9,11)", "Unit digit and last two digit patterns", "HCF and LCM basics", "Remainder concepts", "Face value vs place value"], p: ["Unit digit cycles", "Number classification", "Divisibility rules"], q: ["Find unit digit", "Classify the number", "Check divisibility"] },
+                { n: 2, t: "Simplification & Approximation", s: "BODMAS, surds, indices", def: "Simplification involves reducing expressions to their simplest form using rules of operations. Approximation means finding a value close enough to the exact answer to save time in exams.", syl: ["BODMAS rule and precedence", "Fractions and decimals operations", "Surds — addition, multiplication, rationalisation", "Indices and exponent rules", "Approximation to nearest integer/decimal", "Comparison of fractions"], p: ["BODMAS order", "Approximation to nearest unit", "Surd simplification"], q: ["Simplify expressions", "Approximate value", "Compare fractions"] },
+                { n: 3, t: "LCM and HCF", s: "Factors, multiples, GCD", def: "LCM (Lowest Common Multiple) is the smallest number divisible by two or more numbers. HCF (Highest Common Factor) is the largest number that divides all given numbers exactly.", syl: ["Prime factorisation method", "Division method for HCF", "Relationship: LCM x HCF = product of two numbers", "LCM/HCF of fractions", "Word problems: bells ringing, meetings, tiling", "Co-prime numbers"], p: ["Prime factorisation", "LCM x HCF = product", "Shortcut division method"], q: ["Find LCM/HCF of numbers", "Word problems on bells/meetings", "Number of common factors"] },
+                { n: 4, t: "Ratio and Proportion", s: "Direct, inverse, compound ratio", def: "Ratio compares two quantities of the same kind. Proportion states that two ratios are equal. It forms the base for topics like mixture, partnership, and percentage.", syl: ["Types of ratios: duplicate, triplicate, sub-duplicate", "Direct and inverse proportion", "Compound and continued ratio", "Componendo and dividendo rule", "Fourth proportional, third proportional, mean proportional", "Partnership — capital and time ratio"], p: ["Componendo-dividendo", "Combined ratio chain", "Partnership time ratio"], q: ["Divide in ratio", "Third proportional", "Partner profit share"] },
+                { n: 5, t: "Average", s: "Simple avg, weighted avg, mean", def: "Average is the sum of all observations divided by the number of observations. It represents a central value and is widely used in age, marks, speed, and salary problems.", syl: ["Simple average formula", "Weighted average", "Effect of adding/removing a member", "Replacement trick", "Average of consecutive numbers", "Average speed (not arithmetic mean of speeds)"], p: ["Replacement trick", "New member effect", "Weighted mean shortcut"], q: ["Class average", "Batting/bowling average", "Age-average combo"] }
+              ]
+            },
+            {
+              label: "Phase 2 — Core Arithmetic", topics: [
+                { n: 6, t: "Percentages", s: "% change, % of, successive %", def: "Percentage means per hundred. It is used to express a number as a fraction of 100 and is the foundation for profit/loss, interest, data interpretation, and more.", syl: ["Converting fractions/decimals to percentages", "Percentage increase and decrease", "Percentage of a quantity", "Successive percentage change formula", "Percentage point vs percentage change", "Population and income-expenditure problems", "Percentage error"], p: ["Successive % formula", "% increase/decrease", "Base-change concept"], q: ["Income/expenditure problems", "Population growth", "Exam marks based"] },
+                { n: 7, t: "Profit and Loss", s: "CP, SP, discount, marked price", def: "Profit and Loss deals with buying and selling of goods. It measures gain or loss relative to the cost price and appears heavily in placement tests.", syl: ["Cost price (CP), selling price (SP), marked price (MP)", "Profit % and loss % formulas", "Discount = MP - SP", "Successive discounts", "Dishonest dealer using false weights", "Two items at same SP — one profit one loss", "Break-even point", "Equivalent single discount"], p: ["Discount on MP formula", "Fake weights trick", "Two-article combo"], q: ["Find gain/loss %", "Find SP or CP", "Dishonest dealer", "Successive discounts"] },
+                { n: 8, t: "Simple Interest", s: "P, R, T relationship", def: "Simple Interest is interest calculated only on the principal amount for a given time and rate. It builds the base for compound interest.", syl: ["Formula: SI = (P x R x T) / 100", "Finding principal, rate, or time given SI", "Interest for multiple time periods", "Splitting principal between two rates", "Annual vs half-yearly vs quarterly", "Difference between two SI scenarios"], p: ["SI = PRT/100", "Find any missing variable", "Multiple period splits"], q: ["Find P/R/T", "Split investment", "Difference of rates"] },
+                { n: 9, t: "Compound Interest", s: "CI, instalments, half-yearly", def: "Compound Interest is calculated on both principal and accumulated interest. It models real-world financial scenarios and is more frequently asked than SI.", syl: ["Formula: A = P(1 + r/100)^n", "CI = A - P", "Half-yearly and quarterly compounding", "Difference between CI and SI for 2 and 3 years", "Equal instalment problems", "Population growth/depreciation using CI"], p: ["CI = P(1+r/100)^n", "Difference of SI and CI", "Half-yearly/quarterly adj."], q: ["Find amount after N years", "Instalment problems", "CI vs SI difference"] },
+                { n: 10, t: "Problem on Age", s: "Past, present, future ages", def: "Age problems involve finding present, past, or future ages using given conditions. They test the ability to form and solve linear equations from word problems.", syl: ["Setting up linear equations from age conditions", "Ratio of ages at present and in future/past", "Two-person and three-person age problems", "Age difference remains constant", "Father-son, mother-daughter patterns", "Average age problems"], p: ["Linear equation setup", "Ratio-based ages", "Two-person age gap"], q: ["Find present age", "After/before N years", "Father-son ratio"] },
+                { n: 11, t: "Mixture and Alligations", s: "Rule of alligation, replacement", def: "Mixture problems involve combining two or more substances. Alligation is a shortcut rule to find the ratio in which two ingredients must be mixed to get a desired mean value.", syl: ["Rule of alligation (cross method)", "Mean price concept", "Mixing two liquids of different concentrations", "Repeated replacement/dilution formula", "Three-ingredient mixtures", "Milk-water problems"], p: ["Alligation cross method", "Mean price", "Successive replacement"], q: ["Mixing two prices", "Find ratio to mix", "Successive dilution"] }
+              ]
+            },
+            {
+              label: "Phase 3 — Speed, Work and Pipes", topics: [
+                { n: 12, t: "Time, Speed and Distance", s: "Relative speed, average speed", def: "This topic deals with the relationship between time, speed, and distance. It is one of the most important topics and appears in almost every placement test.", syl: ["Basic formula: Distance = Speed x Time", "Unit conversions (km/h to m/s: x5/18)", "Average speed = 2xy/(x+y) for equal distances", "Relative speed: same direction (subtract), opposite (add)", "Meeting point problems", "Circular track problems", "Two-object catch-up problems"], p: ["Relative speed (same/opp)", "Average speed trap", "Meet/catch problems"], q: ["Two objects meeting", "Average speed problem", "Catch-up time"] },
+                { n: 13, t: "Trains, Boats and Streams", s: "Crossing, overtaking, river", def: "This is an application of Time-Speed-Distance specifically for trains (with length) and boats moving in water with or against a stream/current.", syl: ["Train crossing a pole, person, platform, another train", "Length of train in crossing problems", "Upstream speed = boat speed - stream speed", "Downstream speed = boat speed + stream speed", "Finding speed of boat/stream", "Two trains starting from opposite ends"], p: ["Train length in crossing", "Stream speed formula", "Overtaking vs meeting"], q: ["Time to cross platform", "Speed of stream", "Trains from opposite ends"] },
+                { n: 14, t: "Race", s: "Headstart, deadheat, laps", def: "Race problems involve comparing speeds of two or more participants. They test understanding of relative speeds, head starts, and circular track meetings.", syl: ["A beats B by distance or time", "Headstart in distance and time", "Dead heat (finish together)", "Circular track — first meeting time", "Multiple participants on circular track", "Converting beats to speed ratio"], p: ["Headstart distance/time", "Deadheat at finish", "Circular race meeting"], q: ["A beats B by X metres", "Who wins the race", "First meeting on circular track"] },
+                { n: 15, t: "Work and Wages", s: "Efficiency, MDH, combined work", def: "Work problems determine how long it takes individuals or groups to complete a task based on their efficiency. Wages are distributed proportional to work done.", syl: ["1-day work = 1/n fraction", "LCM method for combined work", "Efficiency comparison", "Man-Days-Hours (MDH) formula", "Wages divided in ratio of work done", "Alternate day working"], p: ["1-day work fraction", "LCM method", "MDH formula"], q: ["Finish work in N days", "Wages split by work", "Combined efficiency"] },
+                { n: 16, t: "Pipes and Cistern", s: "Fill, drain, combined pipes", def: "Pipes and Cistern is a direct application of Time and Work where pipes fill or drain a tank. Filling pipes do positive work; drainage pipes do negative work.", syl: ["Filling pipe rate = 1/n per hour", "Draining pipe rate = negative", "Net rate when multiple pipes open", "Time to fill with a leak", "Two pipes opened alternately", "Pipe opened/closed after some time"], p: ["Net rate = fill - drain", "Time with multiple pipes", "Leak-based problems"], q: ["Time to fill tank", "Find leak rate", "Alternate pipe opening"] }
+              ]
+            },
+            {
+              label: "Phase 4 — Algebra and Geometry", topics: [
+                { n: 17, t: "Algebra", s: "Linear, quadratic, inequalities", def: "Algebra deals with mathematical symbols and the rules for manipulating them. It underpins almost every word-problem solution in aptitude tests.", syl: ["Linear equations in one and two variables", "Quadratic equations: factoring and formula", "Sum and product of roots (Vieta's formulas)", "Simultaneous equations", "Inequalities: solving and graphing", "Polynomials: remainder and factor theorem", "Algebraic identities"], p: ["Factoring shortcuts", "Sum and product of roots", "Inequality direction flip"], q: ["Solve for x", "Find k value", "Satisfy the inequality"] },
+                { n: 18, t: "Progressions", s: "AP, GP, HP series", def: "Progressions are sequences with a defined pattern. AP has a common difference, GP has a common ratio, and HP is the reciprocal of AP.", syl: ["AP: nth term = a + (n-1)d, Sum = n/2 * (2a+(n-1)d)", "GP: nth term = ar^(n-1)", "Infinite GP sum = a/(1-r) for |r|<1", "HP: nth term via reciprocal of AP", "AM >= GM >= HM relationship", "Inserting means between two terms"], p: ["nth term formula", "Sum formula shortcuts", "AM-GM-HM relation"], q: ["Find nth term", "Find sum of series", "Insert means between terms"] },
+                { n: 19, t: "Logarithms", s: "Log rules, equations, base change", def: "Logarithm is the inverse of exponentiation. log_b(x) = n means b^n = x. It simplifies multiplication/division into addition/subtraction.", syl: ["Definition and basic properties", "log(mn) = log m + log n", "log(m/n) = log m - log n", "log(m^n) = n*log m", "Base change formula", "Solving logarithmic equations", "log 1 = 0, log_a(a) = 1"], p: ["log(mn)=logm+logn", "Base change formula", "Anti-log trick"], q: ["Find value of log expression", "Solve log equation", "Simplify using rules"] },
+                { n: 20, t: "Geometry", s: "Lines, angles, triangles, circles", def: "Geometry deals with shapes, sizes, and properties of figures. It covers lines, angles, triangles, quadrilaterals, and circles used in aptitude reasoning.", syl: ["Types of angles: acute, obtuse, reflex, co-interior", "Properties of parallel lines with transversal", "Triangle: angle sum, exterior angle theorem", "Congruence and similarity rules", "Pythagoras theorem and its converse", "Circle: chord, arc, tangent, sector properties", "Cyclic quadrilateral properties"], p: ["Angle sum property", "Circle theorems", "Congruence/similarity"], q: ["Find unknown angle", "Chord-tangent problems", "Similar triangle ratio"] },
+                { n: 21, t: "Mensuration 2D", s: "Area, perimeter of plane figures", def: "Mensuration 2D deals with measuring areas and perimeters of flat shapes. It is directly tested through shaded region, composite shape, and comparison problems.", syl: ["Area and perimeter of triangle, rectangle, square", "Area of parallelogram, rhombus, trapezium", "Circle: area = pi*r^2, circumference = 2*pi*r", "Sector and segment area", "Composite/irregular shapes by splitting", "Shaded region = outer area - inner area", "Ratio of areas of similar figures"], p: ["Area shortcuts for triangles", "Composite shapes split", "Perimeter vs area traps"], q: ["Find area/perimeter", "Shaded region area", "Ratio of areas"] },
+                { n: 22, t: "Mensuration 3D", s: "Volume, surface area of solids", def: "Mensuration 3D extends measurement to three-dimensional solids. Problems often involve recasting shapes, comparing volumes, or computing surface areas.", syl: ["Cube and cuboid: volume and surface area", "Cylinder: volume = pi*r^2*h, CSA = 2*pi*r*h", "Cone: volume = 1/3*pi*r^2*h, slant height", "Sphere and hemisphere formulas", "Frustum of a cone", "Recasting: melting one solid into another", "Volume comparison problems"], p: ["Volume-surface relation", "Melting/recasting", "Frustum formula"], q: ["Find volume of solid", "Surface area of sphere/cone", "Recasting problems"] },
+                { n: 23, t: "Trigonometry and Height/Distance", s: "Ratios, angles of elevation/depression", def: "Trigonometry uses ratios of sides of a right-angled triangle. Height and Distance is its real-world application — finding heights of buildings or distances between points using angles.", syl: ["sin, cos, tan and their reciprocals", "Standard values: 0, 30, 45, 60, 90 degrees", "Trigonometric identities", "Angle of elevation and angle of depression", "Finding height of tower/building", "Two observers on same side and opposite sides", "Shadow length problems"], p: ["Standard angle values", "Angle of elevation/depression", "Two-observer problems"], q: ["Height of tower", "Distance between two points", "Shadow length problems"] }
+              ]
+            },
+            {
+              label: "Phase 5 — Advanced Topics", topics: [
+                { n: 24, t: "Permutation and Combination", s: "nPr, nCr, arrangements", def: "Permutation counts arrangements where order matters. Combination counts selections where order does not matter. These are foundational to probability and counting problems.", syl: ["Fundamental counting principle", "nPr = n!/(n-r)!", "nCr = n!/r!(n-r)!", "Arrangements with repetition allowed/not", "Circular permutation = (n-1)!", "Selection with conditions (at least, at most)", "Arrangements of letters in a word"], p: ["Circular permutation", "Selection with conditions", "Repetition allowed/not"], q: ["Arrange letters of word", "Form committees", "Handshake problems"] },
+                { n: 25, t: "Probability", s: "Events, P(A union B), Bayes", def: "Probability measures the likelihood of an event occurring. It ranges from 0 (impossible) to 1 (certain) and is built on top of Permutation and Combination.", syl: ["Sample space and events", "P(A) = favourable outcomes / total outcomes", "Complementary events: P(A') = 1 - P(A)", "Mutually exclusive events", "P(A union B) = P(A) + P(B) - P(A intersection B)", "Independent events", "Conditional probability", "Dice, coin, card, and ball problems"], p: ["Complementary event", "Conditional probability", "Dice/card standard sets"], q: ["Card draw problems", "Dice throw", "Balls from urn"] },
+                { n: 26, t: "Clocks", s: "Minute/hour hand angles", def: "Clock problems involve finding angles between hands or times when they are in specific positions. They use the concept of relative angular speed between the minute and hour hand.", syl: ["Speed of minute hand: 6 deg/min, hour hand: 0.5 deg/min", "Relative speed = 5.5 deg/min", "Angle between hands at any time", "Times when hands coincide (every 65 5/11 min)", "Times when hands are opposite (180 deg)", "Times when hands are perpendicular (90 deg)", "Fast/slow/gaining clock problems"], p: ["Relative speed of hands", "Angle formula", "Gaining/losing clocks"], q: ["Find angle between hands", "Time of coincidence", "Faulty clock problems"] },
+                { n: 27, t: "Calendars", s: "Day of week, odd days, leap year", def: "Calendar problems find the day of the week for any given date. They use the concept of odd days — the number of days beyond complete weeks in a given period.", syl: ["Odd days concept (ordinary year = 1 odd day, leap year = 2)", "Leap year rule (divisible by 4; century year by 400)", "Day for any given date using reference", "Day after N days from a given date", "Same calendar year repetition", "Number of Sundays/Mondays in a month/year"], p: ["Odd days counting", "Leap year rule", "Reference day method"], q: ["Find day of given date", "Day after N days", "Same calendar year"] },
+                { n: 28, t: "Data Interpretation", s: "Table, bar, pie, line, mixed charts", def: "Data Interpretation involves reading and analysing data presented in tables, charts, or graphs and answering questions based on calculations from that data.", syl: ["Reading tables and extracting values", "Bar chart and grouped bar chart analysis", "Pie chart: % share and central angle", "Line graph: trend and growth rate", "Mixed/combination charts", "% increase/decrease between years", "Approximation techniques for fast calculation", "Caselet (paragraph-based) DI"], p: ["% share from pie", "Growth rate from line", "Ratio from table", "Approximation method"], q: ["Find value/ratio", "% increase/decrease", "Highest/lowest finder"] }
+              ]
+            }
+          ]
+        },
+        {
+          sec: "Logical Reasoning", color: "#4dabf7", phases: [
+            {
+              label: "Phase 1 — Basic Reasoning", topics: [
+                { n: 1, t: "Number Series", s: "Find pattern in number sequence", def: "Number series questions give a sequence of numbers with a hidden pattern. You must identify the rule and find the missing or next term.", syl: ["Arithmetic series (common difference)", "Geometric series (common ratio)", "Square, cube, and prime-based series", "Difference-of-difference (2nd order) series", "Alternate series (two interleaved series)", "Mixed operations series", "Wrong number in series"], p: ["Difference series", "Ratio series", "Prime/square patterns", "Alternate series"], q: ["Find next term", "Find missing term", "Wrong number in series"] },
+                { n: 2, t: "Letter Series", s: "Pure alphabetic patterns", def: "Letter series uses the 26-letter alphabet with positional values. Patterns are based on forward/backward movement, skipping, or alternating positions.", syl: ["Alphabetical position (A=1 to Z=26)", "Reverse alphabet position (A=26 to Z=1)", "Forward and backward skipping", "Vowel-consonant alternate patterns", "Position arithmetic (e.g. +2, -3 steps)", "Letter pairs and triplets"], p: ["Forward/backward skip", "Vowel-consonant pattern", "Position arithmetic"], q: ["Next letter", "Missing letter", "Position of nth term"] },
+                { n: 3, t: "Letter and Symbol Series", s: "Alphabetic and mixed sequences", def: "This extends letter series to include numbers and symbols. You must track the pattern across letters, digits, and special characters simultaneously.", syl: ["Mixed alphanumeric sequences", "Symbol substitution patterns", "Counting letters/symbols under conditions", "Position-based selection (every 3rd element)", "Series with two/three interleaved tracks"], p: ["Position-based pattern", "Skip series", "Symbol substitution"], q: ["Next letter group", "Missing symbol", "Alphabetic position calc"] },
+                { n: 4, t: "Analogies", s: "Word, number, letter relationships", def: "Analogy questions test your ability to identify a relationship between a given pair and apply the same relationship to find the missing element in another pair.", syl: ["Synonym and antonym analogy", "Part-to-whole and whole-to-part", "Worker and tool / product analogy", "Cause and effect analogy", "Degree of intensity (e.g. warm:hot)", "Number analogies (operations, squares, cubes)", "Letter analogies (position-based)"], p: ["Category relation", "Part-whole", "Degree/intensity", "Action-object"], q: ["Choose similar pair", "Complete the analogy", "Number analogy"] },
+                { n: 5, t: "Verbal Classification", s: "Group words by category", def: "Classification (Odd One Out) asks you to find the item that does not belong to the same group as the others. It tests categorical and logical thinking.", syl: ["Category-based odd one out (animals, tools, countries)", "Property-based classification (even/prime/perfect square)", "Degree/type classification", "Usage or function-based grouping", "Letter/number group odd one out"], p: ["Category exclusion", "Degree of meaning", "Type vs attribute"], q: ["Find odd word out", "Group three items", "Classify by property"] }
+              ]
+            },
+            {
+              label: "Phase 2 — Deductive Reasoning", topics: [
+                { n: 6, t: "Blood Relations", s: "Family tree deduction", def: "Blood relation problems test your ability to determine the relationship between people in a family based on given clues, often presented as dialogue or coded statements.", syl: ["Direct relations: parent, child, sibling, spouse", "Maternal vs paternal relations", "Three-generation family trees", "Coded blood relation statements", "Two-statement combination problems", "Gender identification from context", "Pointing/introducing format questions"], p: ["Generation mapping", "Coded relations", "Two-statement deduction"], q: ["Who is X to Y", "Number of members", "Coded relation puzzles"] },
+                { n: 7, t: "Directions", s: "Navigation and displacement", def: "Direction problems test spatial reasoning. You must track a person's movement through a series of turns and find their final direction or displacement from the start.", syl: ["8 compass directions and turns (left/right/180 deg)", "Shadow direction based on time of day", "Distance calculation using Pythagoras", "Net displacement from origin", "Minimum distance problems", "Facing direction after multiple turns"], p: ["Turn tracking", "Shadow direction (sun)", "Displacement = sqrt(x2+y2)"], q: ["Final direction faced", "Net displacement", "Shadow-based direction"] },
+                { n: 8, t: "Coding-Decoding", s: "Letter/number/symbol codes", def: "Coding-Decoding tests your ability to detect the rule used to encode a word or number and apply the same rule to decode another.", syl: ["Letter shift coding (+n, -n positions)", "Reverse alphabet coding", "Position number substitution", "Conditional coding (vowels/consonants coded differently)", "Symbol-based coding", "Word-to-word and sentence coding", "Number coding for words"], p: ["Shift coding", "Reverse alphabet", "Position-based", "Conditional coding"], q: ["Find code of word", "Decode given message", "Mixed coding puzzle"] },
+                { n: 9, t: "Logical Venn Diagrams", s: "Relationship between groups", def: "Venn diagram questions use overlapping circles to represent relationships between groups. You must identify the correct diagram or answer questions about group membership.", syl: ["Two-circle and three-circle Venn diagrams", "All, some, none relationships", "Finding overlapping/exclusive members", "Which diagram best represents a given relationship", "Members in exactly one/two/all groups", "Applying Venn logic to syllogisms"], p: ["Three-circle overlap", "All/some/no mapping", "Exclusive sets"], q: ["How many in all three", "Which diagram fits", "Members in exactly two"] }
+              ]
+            },
+            {
+              label: "Phase 3 — Statement-Based Reasoning", topics: [
+                { n: 10, t: "Statement and Conclusion", s: "Does conclusion follow?", def: "You are given one or two statements followed by conclusions. You must determine which conclusions definitely follow from the given statements — no outside knowledge allowed.", syl: ["Direct inference from a single statement", "Two-statement combined conclusions", "Definite vs probable conclusion", "Negative and universal statements", "Beyond the statement trap conclusions", "Either-or complementary conclusions"], p: ["Direct inference check", "Definite vs probable", "Beyond-the-statement trap"], q: ["Conclusion definitely follows", "Only I / only II", "Neither follows"] },
+                { n: 11, t: "Statement and Assumptions", s: "Hidden assumption in statement", def: "An assumption is something that is taken for granted or implied in a statement. You must identify which unstated assumptions are implicit in the given statement.", syl: ["Implicit vs explicit assumptions", "Practical/common-sense assumptions", "Always-true vs sometimes-true check", "Negative assumptions", "Assumptions about future actions", "Two-assumption evaluation (both/neither/one)"], p: ["Implicit vs explicit", "Practical assumption", "Always-true check"], q: ["Assumption I implicit", "Both implicit", "Neither implicit"] },
+                { n: 12, t: "Statement and Argument", s: "Strong vs weak arguments", def: "Arguments either support or oppose a given statement/policy. You must judge whether each argument is strong (relevant, logical, important) or weak (vague, trivial, or irrelevant).", syl: ["Definition of strong and weak arguments", "Arguments that are ambiguous or double-edged", "Arguments based on fear or emotion = weak", "Counter-arguments vs supporting arguments", "Evaluating two arguments independently", "Policy/proposal-based statements"], p: ["Strong: relevant and logical", "Weak: vague or irrelevant", "Double-edged argument"], q: ["Argument I strong/weak", "Both strong", "Neither strong"] },
+                { n: 13, t: "Course of Action", s: "Problem to best action", def: "Given a problem situation, you must decide which course of action(s) logically and practically follow to address the problem.", syl: ["Practical vs policy-level action", "Cause-effect link between problem and action", "Evaluating two actions independently", "Both follow / neither follows / only I or II", "Actions that are too extreme or too vague", "Government/administrative action problems"], p: ["Practical vs policy action", "Cause-effect link", "Both/neither action"], q: ["Which action follows", "Both actions justified", "Neither action needed"] },
+                { n: 14, t: "Theme Detection", s: "Central theme of a passage", def: "Theme detection asks you to identify the central message or moral of a short passage or argument. The correct theme is neither too narrow nor too broad.", syl: ["Identifying the central idea", "Avoiding over-generalised and under-generalised options", "Tone and keyword extraction", "Moral/lesson from a short story", "Best title selection", "Distinguishing theme from a detail"], p: ["Keyword extraction", "Tone identification", "Broadest correct theme"], q: ["Best title of passage", "Main idea", "Theme from argument"] },
+                { n: 15, t: "Logical Deduction", s: "Syllogism and Venn logic", def: "Logical deduction (Syllogisms) involves drawing valid conclusions from two or more given statements using All, Some, and No type of propositions.", syl: ["Universal affirmative (All A are B)", "Universal negative (No A is B)", "Particular affirmative (Some A are B)", "Particular negative (Some A are not B)", "Venn diagram method for all four types", "Complementary pairs", "Possibility vs definite conclusions", "Three-statement syllogisms"], p: ["Venn diagram method", "All/Some/No inference", "Complementary pair"], q: ["Which conclusion follows", "Possibility case", "Both conclusions follow"] },
+                { n: 16, t: "Logical Problems", s: "Deductive reasoning puzzles", def: "Logical problems present a set of conditions or clues and ask you to deduce facts about people, objects, or events using systematic elimination.", syl: ["Condition-based elimination grid", "If-then logical chains", "Fact vs inference vs judgement", "Ranking and ordering deductions", "True/false statement logic puzzles", "Multi-condition constraint problems"], p: ["Condition-based elimination", "If-then chains", "Fact-inference split"], q: ["Which statement is true", "Valid conclusion", "Identify the assumption"] }
+              ]
+            },
+            {
+              label: "Phase 4 — Arrangement and Puzzles", topics: [
+                { n: 17, t: "Seating Arrangement", s: "Linear, circular, floor puzzles", def: "Seating arrangement problems place people or objects in positions based on given conditions. They are among the most frequently asked puzzle types in placement exams.", syl: ["Linear arrangement (row facing one/both sides)", "Circular arrangement (clockwise/anticlockwise)", "Floor/building-based arrangement", "Box stacking puzzles", "Conditional placement (A not next to B)", "Double row arrangements", "Tabular/grid-based complex arrangements"], p: ["Circular gap method", "Conditional placement", "Row-facing logic"], q: ["Who sits at end", "Position of X", "Floor-based puzzle"] },
+                { n: 18, t: "Input-Output", s: "Machine rearrangement steps", def: "Input-Output problems show a machine rearranging words and/or numbers in steps. You must identify the rule and predict the output at any step.", syl: ["Word + number alternating arrangement", "Ascending/descending sort-based rearrangement", "Left/right shifting patterns", "Reversal and swap operations", "Finding output at step N", "Finding original input from a given step", "Multi-rule combination machines"], p: ["Word+number sort", "Step-by-step tracking", "Reversal operations"], q: ["Find step N output", "What is the input", "How many total steps"] }
+              ]
+            }
+          ]
+        },
+        {
+          sec: "Verbal Ability", color: "#ff6b6b", phases: [
+            {
+              label: "Phase 1 — Word-Level Skills", topics: [
+                { n: 1, t: "Spellings", s: "Identify correctly/incorrectly spelt", def: "Spelling questions test your knowledge of correct English spellings. You must identify the misspelt word in a group or choose the correctly spelt word from options.", syl: ["Common misspelling patterns in English", "Silent letter words (knife, psychology)", "Double-letter traps (accommodate, occurrence)", "ie vs ei rule", "Words commonly confused (affect/effect, principal/principle)", "Prefixes and suffixes affecting spelling"], p: ["Common misspelling patterns", "Double-letter traps", "Silent letter words"], q: ["Find misspelt word", "All correct option", "Group by correct spelling"] },
+                { n: 2, t: "Synonyms", s: "Words with similar meaning", def: "Synonyms are words with the same or nearly the same meaning. These questions test vocabulary breadth and contextual understanding of word usage.", syl: ["Direct synonym identification", "Contextual synonyms (meaning changes with context)", "Degree of meaning (sad vs devastated)", "Root word approach to guess meaning", "Formal vs informal synonyms", "Commonly tested synonym pairs in placement exams"], p: ["Root word approach", "Contextual synonym", "Degree of meaning"], q: ["Choose correct synonym", "Closest in meaning", "Usage-based synonym"] },
+                { n: 3, t: "Antonyms", s: "Words with opposite meaning", def: "Antonyms are words with opposite meanings. These questions test vocabulary depth and the ability to identify contrast in meaning.", syl: ["Direct antonym identification", "Prefix-based antonyms (un-, dis-, in-, non-)", "Contextual antonyms", "Gradable vs complementary antonyms", "Converse antonyms (buy/sell, teach/learn)", "Commonly tested antonym pairs"], p: ["Direct opposite", "Contextual antonym", "Prefix-based antonym"], q: ["Choose correct antonym", "Opposite in context", "Pair the antonyms"] },
+                { n: 4, t: "One Word Substitutes", s: "Replace phrase with one word", def: "One word substitution replaces a descriptive phrase with a single precise word. It tests vocabulary range and is a high-scoring topic with predictable word lists.", syl: ["Words for specific types of people (e.g. omnivore, philanthropist)", "Words for actions or conditions (e.g. plagiarism, altruism)", "Words from Latin/Greek origins", "Government and law-related substitutes", "Science and medical substitutes", "Commonly repeated substitutes in placement exams"], p: ["Category of people", "Actions/conditions", "Latin-origin words"], q: ["Choose the one word", "Which phrase matches", "Fill with substitute"] },
+                { n: 5, t: "Idioms and Phrases", s: "Meaning of idiomatic expressions", def: "Idioms are fixed phrases whose meaning cannot be understood from the individual words. These appear in fill-in-the-blank, meaning, and usage questions.", syl: ["Common English idioms and their meanings", "Body-part idioms (cost an arm and a leg)", "Animal idioms (dark horse, let the cat out)", "Colour idioms (once in a blue moon)", "Correct usage of idiom in a sentence", "Differentiating between similar-looking idioms"], p: ["Contextual meaning", "Literal vs figurative", "Common placement idioms"], q: ["Meaning of idiom", "Correct usage", "Fill with correct idiom"] },
+                { n: 6, t: "Verbal Analogies", s: "Word relationship pairs", def: "Verbal analogies test your ability to identify the logical relationship between a word pair and find another pair with the same relationship.", syl: ["Synonym and antonym analogies", "Tool and its use/user", "Part to whole (wheel:car)", "Cause and effect", "Degree of intensity analogy", "Worker to product analogy", "Grammar-based analogies"], p: ["Synonym analogy", "Part-whole", "Cause-effect", "Degree analogy"], q: ["Choose completing pair", "Same relationship", "Analogy type identification"] }
+              ]
+            },
+            {
+              label: "Phase 2 — Grammar Essentials", topics: [
+                { n: 7, t: "Articles", s: "A, an, the — correct usage", def: "Articles (a, an, the) are determiners that define a noun as specific or unspecific. Correct article usage is tested in error spotting and fill-in-the-blank questions.", syl: ["Indefinite articles: a (consonant sound), an (vowel sound)", "Definite article: the (specific/unique)", "Zero article: no article before proper nouns, languages, meals", "The before superlatives, unique things, rivers, ranges", "Articles with abbreviations and acronyms", "Common article error patterns"], p: ["Definite vs indefinite", "Vowel sound rule for 'an'", "Zero article cases"], q: ["Fill correct article", "No article needed", "Article in sentences"] },
+                { n: 8, t: "Preposition", s: "Correct preposition usage", def: "Prepositions show the relationship between a noun/pronoun and other words. Wrong preposition usage is one of the most common error types in placement verbal sections.", syl: ["Prepositions of time: at, on, in, since, for", "Prepositions of place: at, on, in, above, below", "Prepositions of direction: to, into, onto, towards", "Fixed prepositions with verbs (agree with, consist of)", "Fixed prepositions with adjectives (afraid of, good at)", "Phrasal verbs with prepositions", "Common preposition error pairs (between/among, beside/besides)"], p: ["Preposition of time/place", "Fixed prepositions", "Phrasal verb prepositions"], q: ["Fill correct preposition", "Spot the preposition error", "Preposition pairs"] },
+                { n: 9, t: "Adjectives", s: "Degrees, types, usage", def: "Adjectives describe or modify nouns. Questions test correct degree of comparison, adjective order, and common misuse.", syl: ["Positive, comparative, superlative degrees", "Irregular adjectives (good-better-best, bad-worse-worst)", "Double comparative error (more better)", "Adjective order rule (opinion-size-age-shape-colour-origin-material)", "Misplaced adjective errors", "Adjective vs adverb confusion", "Absolute adjectives (unique, perfect, dead — no degree)"], p: ["Comparative/superlative", "Adjective order", "Misplaced adjective"], q: ["Correct degree of comparison", "Fill the adjective", "Spot adjective error"] },
+                { n: 10, t: "Spotting Errors", s: "Identify grammatical mistakes", def: "Spotting errors gives a sentence divided into parts and asks you to find the part that has a grammatical error, or identify if there is no error.", syl: ["Subject-verb agreement errors", "Tense consistency errors", "Article and preposition errors", "Pronoun-antecedent agreement", "Misuse of adjective/adverb", "Double negatives", "Parallelism errors", "Dangling and misplaced modifiers"], p: ["Subject-verb agreement", "Article/preposition error", "Tense consistency"], q: ["Which part has error", "No error option", "Correct the underlined part"] },
+                { n: 11, t: "Sentence Correction", s: "Correct the given sentence", def: "Sentence correction provides an incorrect sentence and asks you to choose the corrected version from options, covering all types of grammar errors.", syl: ["Identify error type (tense, agreement, article, preposition)", "Choose the grammatically correct alternative", "No correction required option", "Errors with conditionals (if clauses)", "Redundancy and wordiness errors", "Faulty parallelism correction"], p: ["Article error", "Preposition misuse", "Dangling modifier"], q: ["Underlined part error", "Choose correct version", "No error option"] },
+                { n: 12, t: "Sentence Improvement", s: "Improve the underlined part", def: "Sentence improvement asks you to replace the underlined part of a sentence with a better alternative, improving clarity, grammar, or style.", syl: ["Grammar improvement (correct the error)", "Style improvement (active vs passive voice)", "Vocabulary improvement (better word choice)", "Redundancy removal", "No improvement needed option", "Common improvement patterns in placement papers"], p: ["Better vocabulary choice", "Clarity improvement", "Active vs passive"], q: ["Replace underlined part", "No improvement needed", "Best alternative"] },
+                { n: 13, t: "Change of Voice", s: "Active to passive and vice versa", def: "Voice indicates whether the subject performs (active) or receives (passive) the action. These conversions are directly tested and also help in sentence improvement.", syl: ["Active to passive: object becomes subject + by + agent", "Passive to active conversion", "Tense-wise passive forms (present, past, future, perfect)", "Sentences with two objects (direct/indirect)", "Imperative and interrogative sentence voice change", "Omitting the agent in passive when not needed"], p: ["Object becomes subject", "Tense-wise passive form", "By + agent rule"], q: ["Convert to passive", "Convert to active", "Identify voice"] },
+                { n: 14, t: "Change of Speech", s: "Direct to indirect and vice versa", def: "Reported speech (indirect speech) reports what someone said without quoting their exact words. Direct speech uses the speaker's exact words in quotes.", syl: ["Reporting verb change (says to tells, said to told)", "Tense backshift rules (is to was, will to would, has to had)", "Pronoun changes based on subject/object", "Time and place word changes (now to then, here to there)", "Reporting questions: if/whether for yes-no, wh-word for others", "Reporting commands and requests", "Exclamatory and optative sentence reporting"], p: ["Reporting verb change", "Tense backshift", "Pronoun change rules"], q: ["Convert to indirect", "Convert to direct", "Identify speech type"] }
+              ]
+            },
+            {
+              label: "Phase 3 — Sentence-Level Skills", topics: [
+                { n: 15, t: "Selecting Words", s: "Choose the right word for blank", def: "Word selection (fill in the blank) tests your ability to choose the most appropriate word or phrase to complete a sentence meaningfully and grammatically.", syl: ["Context-based word selection", "Collocations (make a decision, do homework)", "Connotation: positive vs negative word choice", "Confused word pairs (affect/effect, accept/except)", "Phrasal verb selection", "Single blank and double blank questions"], p: ["Contextual fit", "Collocations", "Connotation match"], q: ["Fill in the blank", "Choose best fit", "Which word completes"] },
+                { n: 16, t: "Completing Statements", s: "Complete the sentence logically", def: "Sentence completion requires choosing the word or phrase that best completes the sentence, considering both grammar and logical meaning.", syl: ["Contextual clue-based completion", "Contrast connectors (although, despite, however)", "Cause-effect completion (because, therefore, so)", "Tone consistency (positive/negative sentence ending)", "Single blank and double blank formats", "Para completion (last sentence of a paragraph)"], p: ["Contextual clue", "Contrast/cause connectors", "Tone consistency"], q: ["Single blank completion", "Double blank", "Best logical ending"] },
+                { n: 17, t: "Sentence Formation", s: "Form sentence from jumbled words", def: "Sentence formation tests your ability to rearrange jumbled words into a grammatically correct and meaningful sentence.", syl: ["Subject + verb + object order", "Placement of adjectives before nouns", "Adverb placement rules", "Modifier must be near the word it modifies", "Connector words placed logically", "Identifying the subject of the sentence first"], p: ["Subject first", "Modifier placement", "Connector logic"], q: ["Arrange words to form sentence", "Which is grammatically correct", "Meaningful sentence order"] },
+                { n: 18, t: "Ordering of Words", s: "Arrange words/sentences logically", def: "This tests your ability to arrange given words or phrases in a logical sequence to form a coherent and meaningful sentence.", syl: ["Chronological and sequential ordering", "General to specific or specific to general", "Cause to effect ordering", "Superlative/comparative ordering", "Logical flow in instructions", "Question-form sentence ordering"], p: ["Chronological order", "General to specific", "Cause to effect"], q: ["Logical order of words", "Sequence 1-5", "Which comes first"] }
+              ]
+            },
+            {
+              label: "Phase 4 — Passage-Level Skills", topics: [
+                { n: 19, t: "Para Jumbles", s: "Rearrange sentences into paragraph", def: "Para jumbles give 4-6 sentences out of order. You must rearrange them into a logically flowing paragraph. This tests reading comprehension and logical sequencing.", syl: ["Identifying the opening sentence (introduces topic, no pronoun reference)", "Identifying the closing sentence (conclusion, no loose end)", "Pronoun reference links (it, they, this, that)", "Connector and transition words (however, therefore, moreover)", "Chronological and logical sequence", "Mandatory pairs (two sentences that must be adjacent)"], p: ["Opening sentence (no pronoun)", "Pronoun reference link", "Connector words (however/thus)"], q: ["ABCDE correct order", "Which is 1st/last", "Choose correct sequence"] },
+                { n: 20, t: "Paragraph Formation", s: "Build coherent paragraphs", def: "Paragraph formation asks you to identify which sentence fits into a paragraph, which is the odd one out, or how to order sentences for a coherent paragraph.", syl: ["Topic sentence identification (main idea of paragraph)", "Supporting detail arrangement", "Concluding sentence characteristics", "Odd sentence that breaks flow", "Transition between two paragraphs", "Unity and coherence in a paragraph"], p: ["Topic sentence first", "Supporting detail flow", "Concluding sentence"], q: ["Which sentence fits", "Order the paragraph", "Odd sentence out"] },
+                { n: 21, t: "Cloze Test", s: "Fill multiple blanks in a passage", def: "A cloze test is a passage with multiple blanks. You must fill each blank with the most appropriate word based on the theme, grammar, and context of the surrounding text.", syl: ["Theme identification of the passage", "Grammar-based blank filling (tense, article, preposition)", "Vocabulary-based blank filling (contextual word)", "Collocations in context", "Maintaining tense consistency throughout", "Transition/connector word selection", "Reading the full passage before filling blanks"], p: ["Passage theme check", "Collocations in context", "Tense uniformity"], q: ["All blanks in one passage", "Theme-based vocab", "Grammar + vocab combo"] },
+                { n: 22, t: "Comprehension", s: "Read and answer questions", def: "Reading Comprehension gives a passage followed by questions. It tests your ability to understand, infer, and analyse written information — and is the highest-weightage verbal topic.", syl: ["Main idea and central theme questions", "Author's tone and attitude (critical, appreciative, neutral)", "Direct information questions (facts stated in passage)", "Inference questions (implied meaning)", "Vocabulary in context (meaning of a word as used)", "True/False/Cannot be determined questions", "Title suggestion questions", "Assumption-based questions from passage"], p: ["Main idea", "Tone/attitude", "Inference", "Vocab in context"], q: ["Author's purpose", "True/false statement", "Synonym from passage", "Inference question"] }
+              ]
+            }
+          ]
+        }
+      ];
+
+      // ═══════════════════════════════════════════════════
+      // GUIDE DATA
+      // ═══════════════════════════════════════════════════
+      const GUIDE_DATA = [
+        {
+          phase: "PHASE 1", title: "Foundations", color: "#ff6b6b", topics: [
+            { id: "g1", n: 1, t: "Arrays & Strings", s: "Contiguous memory, immutability", def: "Arrays store elements in contiguous memory for O(1) access by index. Strings are arrays of characters — in many languages they are immutable, meaning modification creates a new copy rather than editing in-place.", syl: ["Static arrays: fixed size, O(1) access, O(n) insert/delete", "Dynamic arrays: resizable, amortized O(1) append", "Cache efficiency: sequential access is faster due to memory locality", "String immutability: Java/Python strings create new objects on modification", "StringBuilder/StringBuffer for efficient string building"], rec: ["Subarray problems (max, min, sum) → check Kadane's or prefix sum", "Sorting/partitioning elements in-place → Dutch National Flag or two-pointer", "String has anagram/palindrome/frequency condition → character frequency array", "Multiple strings, find common characters → frequency intersection"] },
+            { id: "g2", n: 2, t: "Hashing", s: "O(1) lookup, frequency, indexing", def: "Hashing maps keys to array positions using a hash function, enabling average O(1) insert, delete, and lookup. Collisions are handled via chaining (linked lists at each bucket) or open addressing (probing for next empty slot).", syl: ["Hash function: deterministic mapping from key to index", "Buckets: array slots where values are stored", "Chaining: each bucket holds a linked list of colliding elements", "Open addressing: probe sequence (linear, quadratic, double hashing)", "Load factor: ratio of elements to buckets; rehashing occurs when exceeded"], rec: ["Need O(1) lookup for existence → HashSet", "Need to count frequency of elements → HashMap<element, count>", "Find first/last position of element → HashMap<element, index>", "Two-sum / pair problems → complement lookup in HashSet", "Group elements by property → HashMap<property, list>"] },
+            { id: "g3", n: 3, t: "Two Pointers", s: "Left+right or slow+fast convergence", def: "Two Pointers uses two index variables that move through the data structure, either from opposite ends toward the center or in the same direction at different speeds. This eliminates nested loops for many array/string problems.", syl: ["Opposite-end: left=0, right=n-1, converge based on condition", "Same-direction: slow and fast pointers, used for in-place filtering", "Partitioning: elements satisfying condition moved to one side", "k-sum: reduce to two-sum by fixing outer elements", "Window variant: two pointers defining a window boundary"], rec: ["Sorted array + pair/triplet with target sum → opposite-end two pointer", "Remove duplicates / filter in-place → slow-fast two pointer", "Partition array by condition (0s and 1s) → two pointer swap", "Container with most water → opposite-end, move smaller height side"] },
+            { id: "g4", n: 4, t: "Sliding Window", s: "Subarray/substring with condition", def: "Sliding Window maintains a contiguous subarray/substring window that slides through the input. The window expands or shrinks based on a condition, allowing O(n) solutions for problems that would otherwise be O(n²).", syl: ["Fixed window: size k, slide by 1 each step", "Variable window: expand right pointer, shrink left when condition violated", "Hashmap window: track element counts inside current window", "At-most-k trick: count(exactly k) = count(at-most k) - count(at-most k-1)", "Deque window: maintain max/min within window in O(1) per step"], rec: ["Max/min/sum of every subarray of size k → fixed sliding window", "Longest substring with at most k distinct chars → variable window with hashmap", "Exactly k occurrences of something → at-most-k trick", "Minimum window containing all characters → variable window, shrink from left"] },
+            { id: "g5", n: 5, t: "Prefix Sum", s: "Range queries in O(1)", def: "Prefix Sum precomputes cumulative sums so that any range query [l, r] can be answered in O(1) after an O(n) build. It is the go-to technique for range sum, range XOR, and subarray-with-sum problems.", syl: ["1D prefix: pre[i] = arr[0]+...+arr[i], sum(l,r) = pre[r]-pre[l-1]", "2D prefix: pre[i][j] = sum of rectangle from (0,0) to (i,j)", "Difference array: D[l]+=v, D[r+1]-=v, then prefix sum gives updated array", "Prefix XOR: xor(l,r) = pre[r] XOR pre[l-1]", "HashMap trick: count of subarrays with sum k = count of (pre[i]-k) in map"], rec: ["Sum of elements in range [l,r] repeatedly → 1D prefix sum", "Range update (add v to all elements in [l,r]) → difference array", "Count subarrays with sum equal to k → prefix sum + hashmap", "2D grid rectangle sum queries → 2D prefix sum"] },
+            { id: "g6", n: 6, t: "Bit Manipulation", s: "XOR, masks, shifts", def: "Bit manipulation directly operates on binary representations of integers using AND, OR, XOR, and shift operators. It enables O(1) solutions for problems involving parity, powers of 2, subset generation, and finding unique elements.", syl: ["n & (n-1): clears lowest set bit — used to count set bits and check power of 2", "n & (-n): isolates lowest set bit — used in Fenwick trees", "XOR properties: a^a=0, a^0=a — cancels duplicates", "Left shift: n<<k multiplies by 2^k; right shift: n>>k divides by 2^k", "Bitmask enumeration: for(mask=0; mask<(1<<n); mask++) iterates all subsets"], rec: ["Find single element in array where all others appear twice → XOR all elements", "Check if number is power of 2 → n>0 && (n&(n-1))==0", "Generate all subsets of a set of n elements → bitmask 0 to 2^n-1", "Count number of 1-bits → Brian Kernighan: while(n) n&=n-1, count++", "Swap two numbers without temp → a^=b; b^=a; a^=b"] },
+            { id: "g7", n: 7, t: "Sorting", s: "Comparison, counting, custom", def: "Sorting arranges elements in order. Beyond basic sort, competitive programming uses sorting as a preprocessing step to enable binary search, greedy choices, and two-pointer techniques on otherwise unordered data.", syl: ["Merge sort: O(n log n) stable, divide array, merge sorted halves — basis for inversion count", "Quick sort: O(n log n) avg, partition around pivot — in-place but unstable", "Counting sort: O(n+k) for integer keys in range [0,k]", "Radix sort: O(d*(n+k)) digit-by-digit sort for integers", "Custom comparator: sort by second element, sort structs, sort by frequency"], rec: ["Need sorted order as prerequisite for binary search or two-pointer → sort first", "Count inversions (pairs where arr[i]>arr[j], i<j) → modified merge sort", "Sort objects by multiple keys → custom comparator with lambda", "Elements in small integer range → counting sort for O(n) performance", "Find k-th largest without full sort → quick select"] },
+            { id: "g8", n: 8, t: "Binary Search", s: "Search on sorted or monotone space", def: "Binary Search finds a target in a sorted collection in O(log n) by repeatedly halving the search space. More powerfully, it can search on the answer space for any problem with a monotone decision function.", syl: ["Classic: lo=0, hi=n-1, mid=(lo+hi)/2, compare and halve", "Lower bound: first index where arr[idx]>=target", "Upper bound: first index where arr[idx]>target", "Search on answer: find minimum x such that check(x) is true", "Rotated array: find pivot first, then binary search appropriate half"], rec: ["Sorted array, find if value exists or its position → classic binary search", "Find first/last occurrence of value → lower/upper bound", "Minimize the maximum or maximize the minimum → binary search on answer", "Array rotated at unknown pivot, find element → two-phase binary search", "Answer is a real number (e.g. square root, capacity) → binary search on floats"] },
+            { id: "g9", n: 9, t: "Line Sweep", s: "Events sorted by coordinate", def: "Line Sweep simulates a vertical line moving left to right across a plane, processing discrete events in sorted order. It converts geometric and interval problems into efficient event-processing algorithms.", syl: ["Event creation: turn each interval/object into start and end events", "Sort events by x-coordinate (break ties: starts before ends for overlap, ends before starts for meeting rooms)", "Active set: maintain currently active elements as sweep line passes", "Coordinate compression: map sparse coordinates to dense indices 0..m-1 before sweeping", "Difference array sweep: D[start]++, D[end+1]--, prefix sum gives count at each point"], rec: ["Count overlapping intervals at any point → sweep with +1/-1 events", "Do any two intervals overlap? → sort by start, check consecutive end vs next start", "Area of union of rectangles → coordinate compress y, sweep x with segment tree", "Skyline problem (building heights) → sweep building edges with max-heap", "Count points inside each rectangle → offline sweep with BIT"] }
+          ]
+        },
+        {
+          phase: "PHASE 2", title: "Core Data Structures", color: "#ffa94d", topics: [
+            { id: "g10", n: 10, t: "Linked List", s: "Pointer chains, no random access", def: "A linked list is a sequence of nodes where each node holds a value and a pointer to the next node. Unlike arrays, insertion and deletion at known positions are O(1), but random access is O(n).", syl: ["Singly linked: each node has next pointer; traversal is one-directional", "Doubly linked: each node has next and prev; O(1) deletion given node reference", "Circular linked: tail points back to head; used in round-robin scheduling", "Floyd's cycle detection: slow pointer moves 1 step, fast pointer moves 2 steps; they meet iff cycle exists", "Reversal: maintain prev, curr, next pointers and relink iteratively"], rec: ["Detect loop/cycle in linked list → Floyd's slow-fast pointer", "Reverse a linked list (whole or partial) → iterative three-pointer technique", "Merge two sorted lists without extra space → pointer manipulation, use dummy head", "Find middle of list → slow moves 1 step, fast moves 2 steps; slow is middle when fast reaches end", "Remove nth node from end → two pointers n apart, advance together"] },
+            { id: "g11", n: 11, t: "Stacks", s: "LIFO, monotonic, expression eval", def: "A stack is a Last-In-First-Out (LIFO) data structure. Beyond basic push/pop, monotonic stacks maintain a sorted invariant on the stack, enabling O(n) solutions for next greater/smaller element problems.", syl: ["Basic operations: push (add to top), pop (remove from top), peek (view top) — all O(1)", "Monotonic increasing stack: pop elements smaller than current → useful for next greater element", "Monotonic decreasing stack: pop elements larger than current → useful for next smaller element", "Balanced parentheses: push open brackets, pop and check on close brackets", "Histogram area: use stack to track bars that haven't found their right boundary yet"], rec: ["Find next greater/smaller element for each index → monotonic stack O(n)", "Largest rectangle in histogram → monotonic stack tracking unresolved bars", "Evaluate arithmetic expression or convert infix to postfix → operator stack", "Check balanced parentheses/brackets → stack, push opens, match closes", "Min stack (getMin in O(1)) → auxiliary stack or encode min in difference"] },
+            { id: "g12", n: 12, t: "Queues & Deques", s: "FIFO, sliding window max", def: "A queue is a First-In-First-Out (FIFO) structure. A deque (double-ended queue) allows insertion and deletion at both ends in O(1), making it the key data structure for sliding window maximum/minimum problems.", syl: ["Queue: enqueue at rear, dequeue from front — BFS uses queue for level-order traversal", "Circular queue: array-based queue with front/rear modulo wrap-around", "Queue using two stacks: amortized O(1) enqueue/dequeue", "Deque: insert/delete at both front and rear in O(1)", "Monotonic deque: maintain indices of useful elements, front holds current window max/min"], rec: ["BFS (shortest path in unweighted graph, level-order traversal) → queue", "Implement queue with O(1) all operations using arrays → circular queue", "Sliding window maximum/minimum of size k → monotonic deque O(n)", "Implement stack using queues or vice versa → rotate queue or two-stack trick", "Process elements in FIFO order with constant operations → deque"] },
+            { id: "g13", n: 13, t: "Heaps & Priority Queues", s: "Min/max in O(log n), K-th element", def: "A heap is a complete binary tree satisfying the heap property: every parent is smaller (min-heap) or larger (max-heap) than its children. Priority queues built on heaps support insert and extract-min/max in O(log n).", syl: ["Binary heap stored in array: parent at i, children at 2i+1 and 2i+2", "Heapify-up (sift-up): used after insertion to restore heap property", "Heapify-down (sift-down): used after extraction to restore heap property", "Build heap in O(n): call heapify-down on all non-leaf nodes bottom-up", "Two-heap technique: max-heap for lower half + min-heap for upper half → median in O(log n)"], rec: ["K-th largest/smallest element → min-heap of size k, replace if element > top", "Merge k sorted lists → min-heap with (value, list_index, element_index)", "Continuous median of stream → two heaps (max-heap lower half, min-heap upper half)", "Top-K frequent elements → HashMap for frequency, min-heap of size k", "Greedy problems needing always the minimum/maximum next choice → priority queue"] },
+            { id: "g14", n: 14, t: "Recursion & Backtracking", s: "Explore all choices, undo on failure", def: "Recursion solves a problem by breaking it into smaller subproblems of the same type. Backtracking is recursive search with pruning: it explores all candidate solutions but abandons a branch as soon as it determines the branch cannot lead to a valid solution.", syl: ["Base case: condition that stops recursion (empty input, target reached, index out of bounds)", "Recursive case: reduce problem size and call recursively", "Call stack: each recursive call adds a frame; stack overflow occurs with too-deep recursion", "Backtracking template: choose → recurse → unchoose (undo the choice)", "Pruning: constraint checks before recursing to avoid exploring invalid branches"], rec: ["Generate all subsets or combinations → backtracking with include/exclude choice", "Generate all permutations → backtracking with used[] array to track choices", "Solve constraint satisfaction (N-Queens, Sudoku) → backtrack on invalid placement", "Word search in grid → DFS with visited marking and backtrack (unmark on return)", "Count or find all valid arrangements satisfying constraints → backtracking"] },
+            { id: "g15", n: 15, t: "Trees", s: "Hierarchical, BST, traversals", def: "A tree is a hierarchical graph with no cycles. Binary trees have at most 2 children per node. Binary Search Trees (BSTs) maintain left < root < right, enabling O(h) search, insert, and delete where h is the tree height.", syl: ["Inorder (Left-Root-Right): gives sorted order for BST", "Preorder (Root-Left-Right): used to serialize/reconstruct a tree", "Postorder (Left-Right-Root): used for deletion, expression tree evaluation", "Level-order: BFS with queue, processes nodes level by level", "BST operations: search, insert, delete (3 cases: leaf, one child, two children — replace with inorder successor)"], rec: ["Print/process nodes in sorted order → BST inorder traversal", "Reconstruct tree from preorder+inorder or postorder+inorder → recursive split", "Find LCA of two nodes → single-pass: if both nodes in different subtrees, current is LCA", "Validate if a binary tree is a valid BST → pass min/max bounds recursively", "Find height, diameter, or check balance → postorder, combine left/right results"] }
+          ]
+        },
+        {
+          phase: "PHASE 3", title: "Intermediate Algorithms", color: "#4dabf7", topics: [
+            { id: "g16", n: 16, t: "Greedy", s: "Local optimum = global optimum", def: "Greedy algorithms make the locally optimal choice at each step with the hope that these local choices lead to a globally optimal solution. They work when the problem has the greedy choice property and optimal substructure.", syl: ["Greedy choice property: a globally optimal solution can be reached by making locally optimal choices", "Optimal substructure: optimal solution to problem contains optimal solutions to subproblems", "Activity selection: sort by end time, always pick earliest-ending compatible activity", "Huffman coding: build optimal prefix code using min-heap", "Proof technique: exchange argument — show swapping any two elements to match greedy order does not improve the solution"], rec: ["Interval scheduling (maximum non-overlapping intervals) → sort by end time, greedily pick", "Minimum number of platforms/rooms needed → sweep line or sort starts/ends separately", "Jump game (can you reach the end?) → track farthest reachable index", "Fractional knapsack (items can be split) → sort by value/weight ratio, take greedily", "Assign tasks to minimize max time → sort and assign, or binary search on answer"] },
+            { id: "g17", n: 17, t: "Divide & Conquer", s: "Split, solve subproblems, merge", def: "Divide and Conquer breaks a problem into smaller subproblems, solves them recursively, and merges their results. The recurrence T(n) = aT(n/b) + f(n) is solved with the Master Theorem.", syl: ["Divide: split problem into smaller instances of the same problem", "Conquer: solve subproblems recursively (base case: trivially solvable)", "Combine: merge subproblem solutions into final answer", "Master theorem: T(n) = aT(n/b) + O(n^d); compare a vs b^d for complexity", "Quick select: partition-based selection in O(n) average — does not fully sort"], rec: ["Count inversions in array → modified merge sort, count cross-inversions during merge", "Find k-th smallest element in O(n) average → quick select with random pivot", "Compute x^n efficiently → fast exponentiation: x^n = x^(n/2) * x^(n/2)", "Closest pair of points → divide plane, solve each half, check strip in O(n log n)", "Multiply large numbers or matrices efficiently → Karatsuba or Strassen algorithms"] },
+            { id: "g18", n: 18, t: "Dynamic Programming — 1D", s: "Overlapping subproblems, single state", def: "Dynamic Programming (DP) solves problems with overlapping subproblems and optimal substructure by storing results of subproblems to avoid recomputation. 1D DP uses a single variable as the state.", syl: ["Memoization (top-down): recursion + cache; natural to write, lazy evaluation", "Tabulation (bottom-up): fill table iteratively; better constant factors, no stack overflow", "State definition: dp[i] represents the optimal answer for the subproblem ending at or considering index i", "Fibonacci pattern: dp[i] = dp[i-1] + dp[i-2], only last 2 values needed", "Transition: define how dp[i] is computed from previous dp values"], rec: ["Maximum subarray sum (Kadane's) → dp[i] = max(arr[i], dp[i-1]+arr[i])", "House robber (no two adjacent) → dp[i] = max(dp[i-1], dp[i-2]+arr[i])", "Minimum coin change → dp[amount] = min over all coins of dp[amount-coin]+1", "Longest increasing subsequence → O(n^2) DP or O(n log n) with binary search", "Climbing stairs / frog jump with variable jumps → recurrence dp[i] = sum of dp[i-k] for valid k"] },
+            { id: "g19", n: 19, t: "Dynamic Programming — 2D", s: "Grid paths, knapsack, two sequences", def: "2D DP uses two variables as the state, typically representing position in two sequences, capacity and item index, or row and column in a grid. Classic problems include LCS, edit distance, and knapsack.", syl: ["Grid paths: dp[i][j] = ways/cost to reach cell (i,j) from (0,0)", "0/1 Knapsack: dp[i][w] = max value using first i items with capacity w", "Unbounded knapsack: items can be reused; remove the -1 in item dimension", "LCS: dp[i][j] = length of LCS of first i chars of s1 and first j chars of s2", "Space optimization: many 2D DP tables can be reduced to 1D by processing row by row"], rec: ["Count/find paths from top-left to bottom-right with obstacles → grid DP", "0/1 Knapsack (can't reuse items) → dp[i][w], include or exclude item i", "Unbounded knapsack (can reuse items) → dp[w], coin change rod cutting", "Edit distance between two strings → dp[i][j] using insert/delete/replace transitions", "Check if subset with given sum exists → boolean dp table"] },
+            { id: "g20", n: 20, t: "DP on Strings", s: "LCS, edit distance, palindrome", def: "DP on strings typically involves comparing or transforming two strings character by character, or finding optimal subsequences/substrings within a single string. Most problems use a 2D table indexed by positions in one or two strings.", syl: ["LCS: dp[i][j] = LCS of s1[0..i] and s2[0..j]; if chars match, dp[i][j]=dp[i-1][j-1]+1", "Longest common substring: like LCS but reset to 0 on mismatch (no gaps allowed)", "Edit distance: dp[i][j] = min edits to convert s1[0..i] to s2[0..j]", "Palindrome DP: dp[i][j] = true if s[i..j] is palindrome; expand from center or DP", "Wildcard/regex matching: dp[i][j] = does pattern[0..i] match string[0..j]"], rec: ["Find longest common subsequence of two strings → 2D DP", "Find minimum insertions/deletions to make two strings equal → LCS", "Find edit distance (minimum insert/delete/replace) → edit distance DP", "Find longest palindromic subsequence → LCS of string with its reverse", "Check if string matches wildcard pattern (* matches any sequence) → 2D DP"] }
+          ]
+        },
+        {
+          phase: "PHASE 4", title: "Graphs", color: "#69db7c", topics: [
+            { id: "g21", n: 21, t: "Graph Representation & Traversal", s: "Adjacency list, BFS, DFS", def: "Graphs model relationships between entities (nodes/vertices) via connections (edges). BFS explores level by level using a queue, finding shortest paths in unweighted graphs. DFS explores as far as possible before backtracking, using a stack or recursion.", syl: ["Adjacency matrix: O(V^2) space, O(1) edge lookup, good for dense graphs", "Adjacency list: O(V+E) space, O(degree) neighbors, good for sparse graphs", "BFS: queue-based, visited[] array, processes nodes level by level", "DFS: recursion or explicit stack, pre/post order; used for component detection", "Flood fill: BFS/DFS on 2D grid treating cells as graph nodes"], rec: ["Shortest path in unweighted graph → BFS (each edge has weight 1)", "Find all connected components in undirected graph → DFS/BFS from each unvisited node", "Number of islands / flood fill problems → BFS or DFS marking visited cells", "Check if graph is bipartite (2-colorable) → BFS with alternating colors", "Detect cycle in undirected graph → DFS with parent tracking, or DSU"] },
+            { id: "g22", n: 22, t: "Topological Sort", s: "Ordering DAG nodes by dependency", def: "Topological sort orders vertices of a Directed Acyclic Graph (DAG) such that for every directed edge u→v, u appears before v. It is the foundation for scheduling, build systems, and course prerequisite problems.", syl: ["Kahn's algorithm (BFS): compute in-degrees, start with all zero-in-degree nodes, process queue", "DFS-based: postorder DFS, push to stack on finish; reverse stack is topo order", "Cycle detection: Kahn's won't process all nodes if cycle exists (processed count < V)", "DAG property: topological sort exists if and only if the graph is a DAG", "Applications: task scheduling, build dependency resolution, course prerequisites"], rec: ["Order tasks respecting dependencies (no cycles) → Kahn's BFS topo sort", "Detect cycle in directed graph → topo sort: if result has fewer than V nodes, cycle exists", "Longest path in DAG → process nodes in topo order, dp[v] = max(dp[u]+w) over edges u→v", "Course schedule — can all courses be completed? → detect cycle in prerequisite graph", "Find order to take courses given prerequisites → topological sort output"] },
+            { id: "g23", n: 23, t: "Shortest Path", s: "Dijkstra, Bellman-Ford, BFS", def: "Shortest path algorithms find minimum cost paths in weighted graphs. Dijkstra works for non-negative weights in O((V+E) log V). Bellman-Ford handles negative weights and detects negative cycles in O(VE).", syl: ["Dijkstra: min-heap of (dist, node), relax neighbors, only non-negative weights", "Bellman-Ford: relax all V-1 rounds; if V-th round still relaxes, negative cycle exists", "Floyd-Warshall: O(V^3) all-pairs DP; dp[i][j] = min path from i to j via any intermediate", "0-1 BFS: deque-based, push front for 0-weight edge, push back for 1-weight edge", "Multi-source BFS: add all sources to queue at start with distance 0; spreads simultaneously"], rec: ["Single-source shortest path, non-negative weights → Dijkstra with min-heap", "Shortest path with possibly negative weights (no negative cycle) → Bellman-Ford", "All-pairs shortest paths (small V, up to ~400) → Floyd-Warshall", "Grid where moves have cost 0 or 1 → 0-1 BFS with deque", "Distance from each cell to nearest source (walls/gates/obstacles) → multi-source BFS"] },
+            { id: "g24", n: 24, t: "Union-Find (DSU)", s: "Disjoint sets, cycle detection", def: "Union-Find (Disjoint Set Union) maintains a collection of disjoint sets and supports two operations: union (merge two sets) and find (identify which set an element belongs to). With path compression and union by rank, both operations are nearly O(1) amortized.", syl: ["find(x): return root of x's set; with path compression, flatten tree during find", "union(x,y): merge smaller-rank tree under larger-rank tree", "Path compression: make every node point directly to root during find", "Union by rank: attach smaller tree under larger, keeps tree height O(log n)", "Dynamic connectivity: supports online queries about component membership"], rec: ["Detect cycle in undirected graph → if union(u,v) and find(u)==find(v) before union, cycle exists", "Count connected components → count distinct roots after all union operations", "Minimum spanning tree (Kruskal's) → sort edges, use DSU to avoid cycles", "Group accounts/people by common property → union elements sharing a property", "Dynamic component queries (offline) → process queries with DSU"] },
+            { id: "g25", n: 25, t: "Minimum Spanning Tree", s: "Kruskal's, Prim's, greedy edge selection", def: "A Minimum Spanning Tree (MST) of a weighted undirected graph is a spanning tree with minimum total edge weight. MSTs model problems like minimum cost network design, clustering, and approximation algorithms.", syl: ["Kruskal's: sort all edges by weight, add edge if it doesn't create cycle (use DSU)", "Prim's: start from any node, greedily add minimum weight edge to unvisited node using min-heap", "Cut property: the minimum weight edge crossing any cut of the graph must be in some MST", "Both algorithms produce MSTs in O(E log E) or O(E log V)", "Second MST: find minimum weight edge not in MST whose addition creates a cycle, then remove max edge in that cycle"], rec: ["Minimum cost to connect all nodes → MST (Kruskal's or Prim's)", "Minimum cost to connect all cities/computers → standard MST problem", "Maximum spanning tree → negate weights and find MST, or use Kruskal's in reverse order", "Check if graph has unique MST → check if all edge weights on the unique cycle are distinct", "Clustering: partition into k groups with maximum inter-group distance → MST then remove k-1 heaviest edges"] },
+            { id: "g26", n: 26, t: "Advanced Graph", s: "Bridges, SCC, Euler path", def: "Advanced graph algorithms find structural properties: bridges/articulation points identify critical connections, Strongly Connected Components (SCC) find groups of mutually reachable nodes in directed graphs, and Euler paths/circuits traverse every edge exactly once.", syl: ["Bridges: edge whose removal disconnects the graph; found by Tarjan's low-time algorithm", "Articulation points: vertex whose removal disconnects the graph; similar Tarjan's approach", "SCC: Kosaraju's (DFS order + reverse graph) or Tarjan's (single DFS with low-link values)", "Euler circuit: exists iff every vertex has even degree (undirected) / in-degree = out-degree (directed)", "Euler path: exists iff exactly 0 or 2 vertices have odd degree; start from odd-degree vertex"], rec: ["Find critical edges in network (removing them disconnects graph) → Tarjan's bridges", "Find which servers are critical in a network → articulation points", "Group nodes that can all reach each other → SCCs (Kosaraju's or Tarjan's)", "Route that traverses every road exactly once → Euler path/circuit (Hierholzer's)", "Check if strongly connected graph has Euler circuit → all in-degrees equal out-degrees"] }
+          ]
+        },
+        {
+          phase: "PHASE 5", title: "Advanced", color: "#da77f2", topics: [
+            { id: "g27", n: 27, t: "Tries", s: "Prefix tree for string search", def: "A Trie (prefix tree) is a tree where each node represents a character, and paths from root to nodes spell out strings/prefixes. It enables O(L) insert, search, and prefix queries where L is string length — faster than hashmap for prefix-based operations.", syl: ["Node structure: children[26] array (or HashMap for general alphabet), isEnd boolean", "Insert: traverse/create nodes for each character, mark last node as end", "Search: traverse nodes for each character, return false if node missing", "Prefix search (startsWith): same as search but don't require isEnd at last node", "XOR Trie: binary trie where each level represents a bit; find max XOR pair by greedily choosing opposite bit"], rec: ["Check if any word in dictionary is prefix of another → Trie insert all words, check isEnd during traversal", "Autocomplete / find all words with given prefix → Trie with DFS from prefix endpoint", "Word search in grid with dictionary → Trie-guided DFS prunes branches with no valid prefix", "Find pair of numbers with maximum XOR → binary XOR Trie, for each number choose opposite bit greedily", "Count distinct substrings → insert all suffixes into Trie, count nodes"] },
+            { id: "g28", n: 28, t: "Segment Trees & BIT", s: "Range queries with point updates", def: "Segment Trees and Binary Indexed Trees (Fenwick Trees) support range queries and point updates in O(log n). Segment trees are more flexible (any associative operation, lazy propagation for range updates). BIT is simpler and faster in practice for prefix sum queries.", syl: ["Segment tree build: O(n), each node stores aggregate of its range", "Point update: O(log n), update leaf and propagate up", "Range query: O(log n), combine relevant nodes covering the query range", "Lazy propagation: defer range updates by storing pending updates in nodes, apply on demand", "BIT (Fenwick tree): parent(i) = i - (i & -i), update: add to i and all ancestors; query: sum i and all responsible ancestors"], rec: ["Range sum query with point updates → BIT (simpler) or segment tree", "Range minimum/maximum query with point updates → segment tree (BIT can't do min/max)", "Range update + range query (add v to range, then sum a range) → segment tree with lazy propagation", "Count inversions in array → BIT with coordinate compression, process right to left", "2D range sum queries with updates → 2D BIT"] },
+            { id: "g29", n: 29, t: "Advanced DP", s: "Bitmask, digit, tree DP", def: "Advanced DP extends beyond linear/2D tables to complex state spaces. Bitmask DP encodes subset states in an integer. Digit DP counts numbers with properties in a range. Tree DP computes answers for subtrees and combines them.", syl: ["Bitmask DP: dp[mask][i] = optimal value using items in mask, ending at i; classic TSP", "Digit DP: process digit by digit with states (position, tight, started), count valid numbers in [L,R]", "DP on trees: dp[v] computed from children's dp values; postorder traversal", "Rerooting: compute dp for all roots by first computing for root 0, then re-derive for each node as root", "SOS DP: dp[mask] = sum over all submasks; enumerate submasks in O(3^n) or use subset-sum DP in O(n * 2^n)"], rec: ["Travelling Salesman / assign n tasks to n people minimizing cost → bitmask DP O(n^2 * 2^n)", "Count integers in [L,R] with digit sum = k or no two adjacent same digits → digit DP", "Find maximum independent set, max path, subtree sum on a tree → tree DP postorder", "After computing tree DP for one root, efficiently compute for all roots → rerooting technique", "Sum/OR/AND over all subsets of a set → SOS DP in O(n * 2^n)"] },
+            { id: "g30", n: 30, t: "String Algorithms", s: "KMP, Z, Rabin-Karp, Manacher's", def: "Advanced string algorithms find patterns efficiently. KMP and Z-algorithm use preprocessing to avoid redundant comparisons in O(n+m). Rabin-Karp uses rolling hash for multiple pattern search. Manacher's finds palindromic substrings in O(n).", syl: ["KMP failure function: fail[i] = length of longest proper prefix of pattern[0..i] that is also a suffix", "Z-array: Z[i] = length of longest substring starting at i that matches a prefix of the string", "Rabin-Karp: rolling hash slides window hash in O(1); hash collision requires string verification", "Manacher's: extend palindrome at each center with preprocessing to avoid re-examination, O(n)", "Suffix array: sorted array of all suffixes; built in O(n log n), enables O(m log n) pattern search"], rec: ["Find all occurrences of pattern in text efficiently → KMP O(n+m)", "Find all positions where a string matches its own prefix → Z-algorithm", "Find longest palindromic substring in O(n) → Manacher's algorithm", "Check if string A is a rotation of string B → check if A is substring of B+B using KMP", "Find longest repeated substring → suffix array + LCP array"] },
+            { id: "g31", n: 31, t: "Math & Number Theory", s: "GCD, primes, modular arithmetic", def: "Number theory provides algorithms for problems involving divisibility, prime numbers, and modular arithmetic. These appear in counting problems, cryptography-adjacent questions, and combination calculations under modulo.", syl: ["Euclidean GCD: gcd(a,b) = gcd(b, a%b); O(log min(a,b))", "Sieve of Eratosthenes: mark multiples of each prime; O(n log log n) to find all primes up to n", "Fermat's little theorem: a^(p-1) = 1 (mod p) for prime p; used to compute modular inverse", "Modular inverse: inv(a) = a^(p-2) mod p (for prime p) using fast exponentiation", "Fast exponentiation: compute a^n mod p in O(log n) by squaring"], rec: ["Find GCD of two or more numbers → Euclidean algorithm", "Find all prime numbers up to N → Sieve of Eratosthenes", "Compute large expression modulo prime (nCr mod p) → Fermat's little theorem for inverse", "Divide under modulo (a/b mod p) → multiply by modular inverse of b", "Count arrangements/selections with result mod 10^9+7 → precompute factorials and inverse factorials"] }
+          ]
+        }
+      ];
+
+      // ═══════════════════════════════════════════════════
+      // DSA STATE
+      // ═══════════════════════════════════════════════════
+      const K = { data: 'dsa_data_v5', chk: 'dsa_chk_v5', open: 'dsa_open_v5', meta: 'dsa_meta_v5', dl: 'dsa_deadline_v5' };
+      let appData = ld(K.data, JSON.parse(JSON.stringify(DEFAULT_DATA)));
+      let checks = ld(K.chk, {});
+      let openMap = ld(K.open, {});
+      let metaMap = ld(K.meta, {});
+      let deadline = ld(K.dl, null);
+      let addSubOpen = null, addTopicPhase = null;
+      let idSeq = Date.now();
+      function genId() { return 'u' + (++idSeq); }
+      function subKey(tid, i) { return tid + ':' + i; }
+      function metaKey(tid, i) { return tid + '__' + i; }
+      function findTopic(tid) { for (const ph of appData) { const t = ph.topics.find(x => x.id === tid); if (t) return t; } return null; }
+      function getMeta(tid, i) { const k = metaKey(tid, i); if (!metaMap[k]) metaMap[k] = { note: '', lc: [] }; return metaMap[k]; }
+      function isDone(tid, i) { return !!checks[subKey(tid, i)]; }
+      function formatSub(text) { const d = text.indexOf(' — '); if (d === -1) return esc(text); return '<strong>' + esc(text.slice(0, d)) + '</strong> — ' + esc(text.slice(d + 3)); }
+      function countSubsTotal() { let t = 0; for (const ph of appData) for (const tp of ph.topics) t += tp.subs.length; return t; }
+      function countSubsDone() { let d = 0; for (const ph of appData) for (const tp of ph.topics) tp.subs.forEach((_, i) => { if (isDone(tp.id, i)) d++; }); return d; }
+
+      // ═══════════════════════════════════════════════════
+      // APTITUDE STATE
+      // ═══════════════════════════════════════════════════
+      let aptChecks = ld('apt_chk_v2', {});
+      let aptOpenMap = ld('apt_open_v2', {});
+      function aptKey(si, n, t, i) { return si + '|' + n + '|' + t + '|' + i; }
+      function aptOpenKey(si, n) { return si + '|' + n; }
+      function aptIsChecked(si, n, t, i) { return !!aptChecks[aptKey(si, n, t, i)]; }
+      function aptToggleCheck(si, n, t, i) { aptChecks[aptKey(si, n, t, i)] = !aptChecks[aptKey(si, n, t, i)]; ps('apt_chk_v2', aptChecks); renderApt(); }
+      function aptToggleTopic(si, n) { const k = aptOpenKey(si, n); aptOpenMap[k] = !aptOpenMap[k]; ps('apt_open_v2', aptOpenMap); renderApt(); }
+
+      // KEY FIX: aptFindTopic searches inside phases[]
+      function aptFindTopic(si, n) {
+        const sec = APT_DATA.find(s => s.sec === si); if (!sec) return null;
+        const phases = sec.phases || [{ topics: sec.topics || [] }];
+        for (const ph of phases) { const t = ph.topics.find(t => t.n === n); if (t) return t; }
+        return null;
+      }
+      function aptTopicBulk(si, n, e) {
+        e.stopPropagation();
+        const topic = aptFindTopic(si, n); if (!topic) return;
+        const keys = [...topic.p.map((_, i) => aptKey(si, n, 'p', i)), ...topic.q.map((_, i) => aptKey(si, n, 'q', i))];
+        const allDone = keys.every(k => !!aptChecks[k]);
+        keys.forEach(k => { aptChecks[k] = !allDone; });
+        ps('apt_chk_v2', aptChecks); renderApt();
+      }
+      function aptTopicProgress(si, n) {
+        const topic = aptFindTopic(si, n); if (!topic) return { done: 0, total: 0 };
+        let done = 0, total = 0;
+        topic.p.forEach((_, i) => { total++; if (aptIsChecked(si, n, 'p', i)) done++; });
+        topic.q.forEach((_, i) => { total++; if (aptIsChecked(si, n, 'q', i)) done++; });
+        return { done, total };
+      }
+      function aptTotalProgress() {
+        let done = 0, total = 0;
+        APT_DATA.forEach(sec => {
+          const phases = sec.phases || [{ topics: sec.topics || [] }];
+          phases.forEach(ph => ph.topics.forEach(t => { const r = aptTopicProgress(sec.sec, t.n); done += r.done; total += r.total; }));
+        });
+        return { done, total };
+      }
+
+      // ═══════════════════════════════════════════════════
+      // GUIDE STATE
+      // ═══════════════════════════════════════════════════
+      let guideOpenMap = ld('guide_open_v2', {});
+      function guideToggle(id) { guideOpenMap[id] = !guideOpenMap[id]; ps('guide_open_v2', guideOpenMap); renderGuide(); }
+
+      // ═══════════════════════════════════════════════════
+      // DEADLINE
+      // ═══════════════════════════════════════════════════
+      function setDeadline(val) { deadline = val || null; ps(K.dl, deadline); renderDeadline(); }
+      function clearDeadline() { deadline = null; ps(K.dl, null); document.getElementById('deadlineInput').value = ''; renderDeadline(); }
+      function renderDeadline() {
+        const banner = document.getElementById('deadlineBanner');
+        const grid = document.getElementById('pacingGrid');
+        const dlClear = document.getElementById('dlClear');
+        const dlInput = document.getElementById('deadlineInput');
+        if (deadline) dlInput.value = deadline;
+        if (!deadline) { banner.classList.remove('has-date'); grid.style.display = 'none'; dlClear.style.display = 'none'; return; }
+        banner.classList.add('has-date'); dlClear.style.display = 'inline-block';
+        const today = new Date(); today.setHours(0, 0, 0, 0);
+        const target = new Date(deadline); target.setHours(0, 0, 0, 0);
+        const daysLeft = Math.ceil((target - today) / 86400000);
+        const weeksLeft = Math.max(0, daysLeft / 7);
+        const totalSubs = countSubsTotal(), doneSubs = countSubsDone(), remaining = totalSubs - doneSubs;
+        const spw = weeksLeft > 0 ? (remaining / weeksLeft).toFixed(1) : '∞';
+        const spd = daysLeft > 0 ? (remaining / daysLeft).toFixed(1) : '∞';
+        const pct = totalSubs ? Math.round(doneSubs / totalSubs * 100) : 0;
+        const urg = daysLeft < 14 ? 'danger' : daysLeft < 30 ? 'warn' : '';
+        grid.style.display = 'grid';
+        grid.innerHTML = `<div class="pacing-card"><div class="pc-val ${urg}">${daysLeft < 0 ? 0 : daysLeft}</div><div class="pc-lbl">days remaining</div></div><div class="pacing-card"><div class="pc-val">${remaining}</div><div class="pc-lbl">subtopics left</div></div><div class="pacing-card"><div class="pc-val ${parseFloat(spw) > 10 ? 'warn' : ''}">${spw}</div><div class="pc-lbl">subtopics/week needed</div></div><div class="pacing-card"><div class="pc-val ${parseFloat(spd) > 3 ? 'warn' : ''}">${spd}</div><div class="pc-lbl">subtopics/day needed</div></div><div class="pacing-card" style="grid-column:1/-1"><div class="pc-lbl" style="margin-bottom:6px">Overall Progress — ${pct}%</div><div class="week-bar-wrap"><div class="week-bar-fill" style="width:${pct}%;background:linear-gradient(90deg,var(--accent),var(--accent2))"></div></div></div>`;
+      }
+
+      // ═══════════════════════════════════════════════════
+      // DSA CHECKS
+      // ═══════════════════════════════════════════════════
+      function toggleSub(tid, i) { checks[subKey(tid, i)] = !checks[subKey(tid, i)]; ps(K.chk, checks); render(); }
+      function toggleTopicBulk(tid, n, e) {
+        e.stopPropagation(); const t = findTopic(tid); if (!t) return;
+        const all = t.subs.every((_, i) => isDone(tid, i));
+        t.subs.forEach((_, i) => { checks[subKey(tid, i)] = !all; });
+        ps(K.chk, checks); render();
+      }
+      function toggleOpen(tid) { openMap[tid] = !openMap[tid]; ps(K.open, openMap); render(); }
+
+      // ═══════════════════════════════════════════════════
+      // NOTE DRAWER
+      // ═══════════════════════════════════════════════════
+      let ndTid = null, ndIdx = null, ndSaveTimer = null;
+      function openNoteDrawer(tid, i, topicName, subText, e) {
+        e.stopPropagation(); ndTid = tid; ndIdx = i;
+        const m = getMeta(tid, i);
+        document.getElementById('ndTopic').textContent = topicName;
+        const dash = subText.indexOf(' — ');
+        const el = document.getElementById('ndSub');
+        if (dash === -1) { el.textContent = subText; }
+        else { el.innerHTML = '<strong>' + esc(subText.slice(0, dash)) + '</strong> — ' + esc(subText.slice(dash + 3)); }
+        renderNdChips(tid, i);
+        document.getElementById('ndNoteArea').innerHTML = m.note || '';
+        const st = document.getElementById('ndSaveStatus');
+        st.textContent = m.note ? '✓ saved' : 'start typing to save';
+        st.className = 'nd-save-status' + (m.note ? ' saved' : '');
+        document.getElementById('noteOverlay').classList.add('open');
+        document.body.style.overflow = 'hidden';
+        setTimeout(() => { document.getElementById('ndNoteArea').focus(); ndUpdateToolbarState(); }, 80);
+      }
+      function closeNoteDrawer(e) {
+        if (e && e.target !== document.getElementById('noteOverlay')) return;
+        ndFlushSave();
+        document.getElementById('noteOverlay').classList.remove('open');
+        document.body.style.overflow = '';
+        ndTid = null; ndIdx = null; render();
+      }
+      function renderNdChips(tid, i) {
+        const m = getMeta(tid, i); const wrap = document.getElementById('ndChips'); if (!wrap) return;
+        if (!m.lc.length) { wrap.innerHTML = '<span style="font-family:JetBrains Mono,monospace;font-size:0.7rem;color:var(--muted)">No problems linked yet</span>'; return; }
+        wrap.innerHTML = m.lc.map(id => `<a class="lc-chip" href="https://leetcode.com/problems/${id}/" target="_blank" rel="noopener">#${id}<span class="chip-x" onclick="ndRemoveLC('${id}',event)">✕</span></a>`).join('');
+      }
+      function ndAddLC() {
+        if (ndTid === null) return;
+        const el = document.getElementById('ndLcInput'); const raw = el.value.trim(); if (!raw) return;
+        const num = raw.match(/(\d{1,5})/); if (!num) { el.value = ''; return; }
+        const id = num[1]; const m = getMeta(ndTid, ndIdx);
+        if (!m.lc.includes(id)) m.lc.push(id);
+        ps(K.meta, metaMap); el.value = ''; renderNdChips(ndTid, ndIdx);
+      }
+      function ndRemoveLC(id, e) {
+        e.preventDefault(); e.stopPropagation(); if (ndTid === null) return;
+        const m = getMeta(ndTid, ndIdx); m.lc = m.lc.filter(x => x !== id);
+        ps(K.meta, metaMap); renderNdChips(ndTid, ndIdx);
+      }
+      function ndAutoSave() {
+        if (ndTid === null) return;
+        const st = document.getElementById('ndSaveStatus');
+        st.textContent = 'saving…'; st.className = 'nd-save-status';
+        clearTimeout(ndSaveTimer);
+        ndSaveTimer = setTimeout(() => {
+          getMeta(ndTid, ndIdx).note = document.getElementById('ndNoteArea').innerHTML;
+          ps(K.meta, metaMap); st.textContent = '✓ saved'; st.className = 'nd-save-status saved';
+        }, 600);
+      }
+      function ndFlushSave() {
+        if (ndTid === null) return; clearTimeout(ndSaveTimer);
+        const el = document.getElementById('ndNoteArea');
+        if (el) { getMeta(ndTid, ndIdx).note = el.innerHTML; ps(K.meta, metaMap); }
+      }
+      function ndCmd(cmd, val) { document.getElementById('ndNoteArea').focus(); document.execCommand(cmd, false, val || null); ndUpdateToolbarState(); ndAutoSave(); }
+      function ndExecFontSize(val) { if (!val) return; ndCmd('fontSize', val); }
+      function ndExecHeading(tag) { if (!tag) return; document.getElementById('ndNoteArea').focus(); document.execCommand('formatBlock', false, tag); ndUpdateToolbarState(); ndAutoSave(); }
+      function ndHighlight() { const sel = window.getSelection(); if (!sel || sel.isCollapsed) return; const range = sel.getRangeAt(0); const parent = range.commonAncestorContainer.parentElement; if (parent && parent.tagName === 'MARK') { const frag = document.createDocumentFragment(); while (parent.firstChild) frag.appendChild(parent.firstChild); parent.parentNode.replaceChild(frag, parent); } else { const mark = document.createElement('mark'); try { range.surroundContents(mark); } catch { } } ndAutoSave(); }
+      function ndInlineCode() { const sel = window.getSelection(); if (!sel || sel.isCollapsed) return; const range = sel.getRangeAt(0); const parent = range.commonAncestorContainer.parentElement; if (parent && parent.tagName === 'CODE') { const frag = document.createDocumentFragment(); while (parent.firstChild) frag.appendChild(parent.firstChild); parent.parentNode.replaceChild(frag, parent); } else { const code = document.createElement('code'); try { range.surroundContents(code); } catch { } } ndAutoSave(); }
+      function ndBlockquote() { document.getElementById('ndNoteArea').focus(); document.execCommand('formatBlock', false, 'blockquote'); ndAutoSave(); }
+      function ndHr() { document.getElementById('ndNoteArea').focus(); document.execCommand('insertHTML', false, '<hr>'); ndAutoSave(); }
+      function ndUpdateToolbarState() { [['bold', 'tbBold'], ['italic', 'tbItalic'], ['underline', 'tbUnder'], ['strikeThrough', 'tbStrike']].forEach(([cmd, id]) => { const btn = document.getElementById(id); if (btn) btn.classList.toggle('active', document.queryCommandState(cmd)); }); }
+      function ndEditorKeydown(e) { if (e.key === 'Tab') { e.preventDefault(); document.execCommand('insertHTML', false, '&nbsp;&nbsp;&nbsp;&nbsp;'); } }
+      document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && document.getElementById('noteOverlay').classList.contains('open')) { ndFlushSave(); document.getElementById('noteOverlay').classList.remove('open'); document.body.style.overflow = ''; ndTid = null; ndIdx = null; render(); } });
+      (function () { function attachPaste() { const editor = document.getElementById('ndNoteArea'); if (!editor) return; editor.addEventListener('paste', function (e) { e.preventDefault(); const text = (e.clipboardData || window.clipboardData).getData('text/plain'); if (!text) return; const html = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\r\n|\r|\n/g, '<br>'); document.execCommand('insertHTML', false, html); ndAutoSave(); }); } if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', attachPaste); else attachPaste(); })();
+
+      // ═══════════════════════════════════════════════════
+      // ADD/REMOVE TOPIC & SUBTOPIC
+      // ═══════════════════════════════════════════════════
+      function showAddTopic(phIdx, e) { e.stopPropagation(); addTopicPhase = phIdx; addSubOpen = null; render(); setTimeout(() => { const el = document.getElementById('newTopicInput'); if (el) el.focus(); }, 40); }
+      function cancelAddTopic() { addTopicPhase = null; render(); }
+      function confirmAddTopic() { const el = document.getElementById('newTopicInput'); const name = el ? el.value.trim() : ''; if (!name) { if (el) el.focus(); return; } const id = genId(); appData[addTopicPhase].topics.push({ id, name, subs: [] }); openMap[id] = true; addTopicPhase = null; ps(K.data, appData); ps(K.open, openMap); render(); }
+      function deleteTopic(tid, tname) { confirm2('Delete topic "' + tname + '"? All subtopics and progress will be lost.', () => { for (const ph of appData) { const idx = ph.topics.findIndex(t => t.id === tid); if (idx !== -1) { const t = ph.topics[idx]; t.subs.forEach((_, i) => { delete checks[subKey(tid, i)]; delete metaMap[metaKey(tid, i)]; }); ph.topics.splice(idx, 1); break; } } ps(K.data, appData); ps(K.chk, checks); ps(K.meta, metaMap); render(); }); }
+      function showAddSub(tid, e) { e.stopPropagation(); addSubOpen = tid; addTopicPhase = null; openMap[tid] = true; ps(K.open, openMap); render(); setTimeout(() => { const el = document.getElementById('nsi_' + tid); if (el) el.focus(); }, 40); }
+      function cancelAddSub() { addSubOpen = null; render(); }
+      function confirmAddSub(tid) { const el = document.getElementById('nsi_' + tid); const text = el ? el.value.trim() : ''; if (!text) { if (el) el.focus(); return; } const t = findTopic(tid); if (!t) return; t.subs.push(text); addSubOpen = null; ps(K.data, appData); render(); }
+      function deleteSub(tid, idx, raw) { const label = raw.length > 55 ? raw.slice(0, 55) + '…' : raw; confirm2('Remove: "' + label + '"?', () => { const t = findTopic(tid); if (!t) return; for (let i = idx; i < t.subs.length - 1; i++) { checks[subKey(tid, i)] = checks[subKey(tid, i + 1)]; metaMap[metaKey(tid, i)] = metaMap[metaKey(tid, i + 1)]; } delete checks[subKey(tid, t.subs.length - 1)]; delete metaMap[metaKey(tid, t.subs.length - 1)]; t.subs.splice(idx, 1); ps(K.data, appData); ps(K.chk, checks); ps(K.meta, metaMap); render(); }); }
+
+      // ═══════════════════════════════════════════════════
+      // MODAL
+      // ═══════════════════════════════════════════════════
+      function confirm2(msg, cb) { document.getElementById('modalMsg').textContent = msg; document.getElementById('modalOverlay').classList.add('open'); document.getElementById('modalConfirmBtn').onclick = () => { closeModal(); cb(); }; }
+      function closeModal() { document.getElementById('modalOverlay').classList.remove('open'); }
+
+      // ═══════════════════════════════════════════════════
+      // RESET
+      // ═══════════════════════════════════════════════════
+      function resetProgress() { confirm2('Reset all checkboxes? Topics, subtopics, notes stay.', () => { checks = {}; ps(K.chk, checks); render(); }); }
+      function resetAll() { confirm2('Reset EVERYTHING?', () => { appData = JSON.parse(JSON.stringify(DEFAULT_DATA)); checks = {}; openMap = {}; metaMap = {}; addSubOpen = null; addTopicPhase = null; ps(K.data, appData); ps(K.chk, checks); ps(K.open, openMap); ps(K.meta, metaMap); render(); }); }
+
+      // ═══════════════════════════════════════════════════
+      // DSA RENDER
+      // ═══════════════════════════════════════════════════
+      function render() {
+        const app = document.getElementById('app');
+        let totalSubs = 0, doneSubs = 0, totalTopics = 0, html = '';
+        appData.forEach((phase, phIdx) => {
+          totalTopics += phase.topics.length;
+          html += `<div class="phase"><div class="phase-header"><span class="phase-badge" style="background:${phase.color}22;color:${phase.color};border:1px solid ${phase.color}44">${esc(phase.phase)}</span><span class="phase-title">${esc(phase.title)}</span><button class="btn-add-topic" onclick="showAddTopic(${phIdx},event)">＋ Add Topic</button></div>`;
+          phase.topics.forEach((topic, order) => {
+            const n = topic.subs.length, done = topic.subs.filter((_, i) => isDone(topic.id, i)).length;
+            const all = n > 0 && done === n, part = done > 0 && done < n, open = !!openMap[topic.id];
+            const cbCls = all ? 'checked' : part ? 'partial' : '';
+            totalSubs += n; doneSubs += done;
+            html += `<div class="topic"><div class="topic-header" onclick="toggleOpen('${topic.id}')"><span class="topic-num">${String(order + 1).padStart(2, '0')}</span><div class="topic-checkbox ${cbCls}" onclick="toggleTopicBulk('${topic.id}',${n},event)"></div><span class="topic-name${all ? ' done' : ''}">${esc(topic.name)}</span><span class="topic-progress">${done}/${n}</span><div class="topic-actions"><button class="icon-btn add-sub" onclick="showAddSub('${topic.id}',event)">＋</button><button class="icon-btn del" onclick="event.stopPropagation();deleteTopic('${topic.id}','${esc(topic.name)}')">✕</button></div><span class="toggle-icon${open ? ' open' : ''}">▶</span></div><div class="subtopics${open ? ' open' : ''}">`;
+            topic.subs.forEach((sub, i) => {
+              const sd = isDone(topic.id, i), m = getMeta(topic.id, i), hasContent = m.note || m.lc.length > 0;
+              const safeRaw = sub.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+              const safeSub = sub.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+              const safeName = topic.name.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+              const lcCount = m.lc.length;
+              const noteSnip = m.note ? m.note.replace(/<[^>]*>/g, '').slice(0, 40) + (m.note.replace(/<[^>]*>/g, '').length > 40 ? '…' : '') : '';
+              html += `<div class="subtopic-wrap"><div class="subtopic-row"><div class="sub-left" onclick="toggleSub('${topic.id}',${i})"><div class="sub-cb${sd ? ' checked' : ''}"></div><div style="flex:1"><span class="sub-label${sd ? ' done' : ''}">${formatSub(sub)}</span>${hasContent ? `<div style="display:flex;gap:6px;margin-top:3px;flex-wrap:wrap;">${lcCount ? `<span style="font-family:JetBrains Mono,monospace;font-size:0.6rem;color:var(--lc);background:rgba(255,161,22,0.08);border:1px solid rgba(255,161,22,0.2);border-radius:4px;padding:1px 5px;">${lcCount} LC</span>` : ''}${m.note ? `<span style="font-family:JetBrains Mono,monospace;font-size:0.6rem;color:var(--accent2);background:rgba(123,97,255,0.08);border:1px solid rgba(123,97,255,0.2);border-radius:4px;padding:1px 5px;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(noteSnip)}</span>` : ''}</div>` : ''}</div></div><div class="sub-actions"><button class="sub-icon note-btn${hasContent ? ' active' : ''}" onclick="openNoteDrawer('${topic.id}',${i},'${safeName}','${safeSub}',event)">📝</button><button class="sub-icon del" onclick="deleteSub('${topic.id}',${i},'${safeRaw}')">✕</button></div></div></div>`;
+            });
+            if (addSubOpen === topic.id) { html += `<div class="add-sub-row"><input class="form-input" id="nsi_${topic.id}" type="text" placeholder="Subtopic — description (Enter to add)" onkeydown="if(event.key==='Enter')confirmAddSub('${topic.id}');else if(event.key==='Escape')cancelAddSub()"><button class="form-btn" onclick="confirmAddSub('${topic.id}')">Add</button><button class="form-btn cancel" onclick="cancelAddSub()">Cancel</button></div>`; }
+            html += `</div></div>`;
+          });
+          if (addTopicPhase === phIdx) { html += `<div class="add-topic-form"><input class="form-input topic-inp" id="newTopicInput" type="text" placeholder="New topic name (Enter to add)" onkeydown="if(event.key==='Enter')confirmAddTopic();else if(event.key==='Escape')cancelAddTopic()"><button class="form-btn" onclick="confirmAddTopic()">Add</button><button class="form-btn cancel" onclick="cancelAddTopic()">Cancel</button></div>`; }
+          html += `</div>`;
+        });
+        app.innerHTML = html;
+        const pct = totalSubs ? Math.round(doneSubs / totalSubs * 100) : 0;
+        document.getElementById('progressFill').style.width = pct + '%';
+        document.getElementById('progressLabel').textContent = `${doneSubs} / ${totalSubs} subtopics completed (${pct}%)`;
+        document.getElementById('topicCount').textContent = totalTopics;
+        renderDeadline();
+      }
+
+      // ═══════════════════════════════════════════════════
+      // APTITUDE RENDER
+      // ═══════════════════════════════════════════════════
+      function renderApt() {
+        const app = document.getElementById('aptApp'); if (!app) return;
+        let html = '';
+        APT_DATA.forEach(secData => {
+          const si = secData.sec, color = secData.color;
+          const phases = secData.phases || [{ label: '', topics: secData.topics || [] }];
+          let secDone = 0, secTotal = 0, totalTopics = 0;
+          phases.forEach(ph => { ph.topics.forEach(t => { const r = aptTopicProgress(si, t.n); secDone += r.done; secTotal += r.total; totalTopics++; }); });
+          html += `<div class="apt-section"><div class="apt-section-header"><span class="apt-section-badge" style="background:${color}22;color:${color};border:1px solid ${color}44">${esc(si)}</span><span class="apt-section-title">${esc(si)}</span><span class="apt-section-count">${totalTopics} topics · ${secDone}/${secTotal}</span></div>`;
+          phases.forEach(phase => {
+            if (phase.label) { html += `<div class="apt-phase-label">${esc(phase.label)}</div>`; }
+            phase.topics.forEach(topic => {
+              const { done, total } = aptTopicProgress(si, topic.n);
+              const all = total > 0 && done === total, part = done > 0 && done < total;
+              const isOpen = !!aptOpenMap[aptOpenKey(si, topic.n)];
+              const cbCls = all ? 'checked' : part ? 'partial' : '';
+              html += `<div class="apt-topic"><div class="apt-topic-header" onclick="aptToggleTopic('${esc(si)}',${topic.n})"><span class="apt-topic-num">${String(topic.n).padStart(2, '0')}</span><div class="apt-cb ${cbCls}" onclick="aptTopicBulk('${esc(si)}',${topic.n},event)"></div><div class="apt-topic-info"><div class="apt-topic-name${all ? ' done' : ''}">${esc(topic.t)}</div><div class="apt-topic-sub">${esc(topic.s)}</div></div><span class="apt-topic-progress">${done}/${total}</span><span class="apt-toggle-icon${isOpen ? ' open' : ''}">▶</span></div><div class="apt-subtopics${isOpen ? ' open' : ''}">`;
+              if (topic.def) { html += `<div class="apt-def">${esc(topic.def)}</div>`; }
+              if (topic.syl && topic.syl.length) {
+                html += `<div class="apt-group-label">Syllabus</div><div class="apt-syl-list">`;
+                topic.syl.forEach(s => { html += `<div class="apt-syl-item">${esc(s)}</div>`; });
+                html += `</div>`;
+              }
+              html += `<div class="apt-group-label">Key Patterns / Tricks</div>`;
+              topic.p.forEach((p, i) => { const chk = aptIsChecked(si, topic.n, 'p', i); html += `<div class="apt-sub-wrap"><div class="apt-sub-row"><div class="apt-sub-left" onclick="aptToggleCheck('${esc(si)}',${topic.n},'p',${i})"><div class="apt-sub-cb${chk ? ' checked' : ''}"></div><span class="apt-sub-label${chk ? ' done' : ''}">${esc(p)}</span></div><span class="apt-tag p">pattern</span></div></div>`; });
+              html += `<div class="apt-group-label">Question Types</div>`;
+              topic.q.forEach((q, i) => { const chk = aptIsChecked(si, topic.n, 'q', i); html += `<div class="apt-sub-wrap"><div class="apt-sub-row"><div class="apt-sub-left" onclick="aptToggleCheck('${esc(si)}',${topic.n},'q',${i})"><div class="apt-sub-cb${chk ? ' checked' : ''}"></div><span class="apt-sub-label${chk ? ' done' : ''}">${esc(q)}</span></div><span class="apt-tag q">question type</span></div></div>`; });
+              html += `</div></div>`;
+            });
+          });
+          html += `</div>`;
+        });
+        app.innerHTML = html;
+        const { done, total } = aptTotalProgress();
+        const pct = total ? Math.round(done / total * 100) : 0;
+        const fill = document.getElementById('aptProgFill'); const label = document.getElementById('aptProgLabel');
+        if (fill) fill.style.width = pct + '%';
+        if (label) label.textContent = `${done} / ${total} items completed (${pct}%)`;
+      }
+
+      // ═══════════════════════════════════════════════════
+      // GUIDE RENDER
+      // ═══════════════════════════════════════════════════
+      function renderGuide() {
+        const app = document.getElementById('guideApp'); if (!app) return;
+        let html = '';
+        GUIDE_DATA.forEach(phase => {
+          html += `<div class="phase"><div class="phase-header"><span class="phase-badge" style="background:${phase.color}22;color:${phase.color};border:1px solid ${phase.color}44">${esc(phase.phase)}</span><span class="phase-title">${esc(phase.title)}</span></div>`;
+          phase.topics.forEach((topic, order) => {
+            const isOpen = !!guideOpenMap[topic.id];
+            html += `<div class="guide-topic"><div class="guide-topic-header" onclick="guideToggle('${topic.id}')"><span class="guide-topic-num">${String(order + 1).padStart(2, '0')}</span><div style="flex:1"><div class="guide-topic-name">${esc(topic.t)}</div><div class="guide-topic-sub">${esc(topic.s)}</div></div><span class="guide-toggle-icon${isOpen ? ' open' : ''}">▶</span></div><div class="guide-body${isOpen ? ' open' : ''}">`;
+            if (topic.def) { html += `<div class="guide-def">${esc(topic.def)}</div>`; }
+            if (topic.syl && topic.syl.length) {
+              html += `<div class="guide-section-label">Syllabus / Concepts</div><div class="guide-list">`;
+              topic.syl.forEach(s => { html += `<div class="guide-item">${esc(s)}</div>`; });
+              html += `</div>`;
+            }
+            if (topic.rec && topic.rec.length) {
+              html += `<div class="guide-section-label">HOW TO RECOGNIZE</div><div class="guide-list">`;
+              topic.rec.forEach(r => { html += `<div class="guide-item">${esc(r)}</div>`; });
+              html += `</div>`;
+            }
+            html += `</div></div>`;
+          });
+          html += `</div>`;
+        });
+        app.innerHTML = html;
+      }
+
+      // ═══════════════════════════════════════════════════
+      // INIT
+      // ═══════════════════════════════════════════════════
+      render();
+      // ensure home page is visible on load and all others hidden
+      showPage('home');
+    </script>
+  </div><!-- /page-wrap -->
+</body>
+
+</html>

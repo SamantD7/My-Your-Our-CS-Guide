@@ -1,0 +1,114 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root,
+[data-theme="dark"] {
+  --bg: #0b0d11;
+  --surface: #12151c;
+  --surface2: #161a24;
+  --border: #1e2330;
+  --accent: #4fffb0;
+  --accent2: #7b61ff;
+  --text: #dde3f0;
+  --muted: #5a6280;
+  --danger: #ff5c5c;
+  --warn: #ffa94d;
+  --lc: #ffa116;
+  --shadow: rgba(0, 0, 0, 0.5);
+  
+  --must: #ff5c5c;
+  --must-bg: rgba(255, 92, 92, 0.12);
+  --must-line: rgba(255, 92, 92, 0.35);
+  --imp: #ffa94d;
+  --imp-bg: rgba(255, 169, 77, 0.12);
+  --imp-line: rgba(255, 169, 77, 0.35);
+  --good: #34d399;
+  --good-bg: rgba(52, 211, 153, 0.12);
+  --good-line: rgba(52, 211, 153, 0.35);
+}
+
+[data-theme="light"] {
+  --bg: #f0f2f7;
+  --surface: #ffffff;
+  --surface2: #f7f8fc;
+  --border: #dce1ef;
+  --accent: #0a9e6e;
+  --accent2: #5b3fc4;
+  --text: #1a1d2e;
+  --muted: #7a82a0;
+  --danger: #d63031;
+  --warn: #e17055;
+  --lc: #d68910;
+  --shadow: rgba(0, 0, 0, 0.08);
+
+  --must: #d63031;
+  --must-bg: rgba(214, 48, 49, 0.1);
+  --must-line: rgba(214, 48, 49, 0.3);
+  --imp: #d68910;
+  --imp-bg: rgba(214, 137, 16, 0.1);
+  --imp-line: rgba(214, 137, 16, 0.3);
+  --good: #0a9e6e;
+  --good-bg: rgba(10, 158, 110, 0.1);
+  --good-line: rgba(10, 158, 110, 0.3);
+}
+
+html {
+  scroll-behavior: smooth;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+  min-height: 100vh;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--muted);
+}
+
+/* Glassmorphism utility */
+.glass-panel {
+  background: var(--surface);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border);
+  box-shadow: 0 8px 32px 0 var(--shadow);
+}
+
+.glass-panel-subtle {
+  background: var(--surface2);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid var(--border);
+}
+
+.gradient-text {
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.animated-mesh-bg {
+  background: radial-gradient(circle at 50% 20%, rgba(123, 97, 255, 0.15), transparent 40%),
+              radial-gradient(circle at 80% 60%, rgba(79, 255, 176, 0.12), transparent 40%),
+              radial-gradient(circle at 20% 80%, rgba(255, 169, 77, 0.1), transparent 40%);
+}
