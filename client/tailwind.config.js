@@ -20,9 +20,9 @@ export default {
         goodBadge: '#34d399'
       },
       fontFamily: {
-        syne: ['Syne', 'sans-serif'],
+        syne: ['Plus Jakarta Sans', 'sans-serif'],
         mono: ['JetBrains Mono', 'monospace'],
-        sans: ['Inter', 'sans-serif']
+        sans: ['Plus Jakarta Sans', 'Inter', 'sans-serif']
       },
       animation: {
         'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
