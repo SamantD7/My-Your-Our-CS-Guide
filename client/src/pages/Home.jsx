@@ -93,7 +93,7 @@ const Home = () => {
       <Navbar />
 
       {/* Hero Section with Animated Mesh & Blobs */}
-      <section className="relative overflow-hidden pt-20 pb-28 animated-mesh-bg">
+      <section className="relative overflow-hidden min-h-screen flex flex-col justify-center items-center pt-20 pb-20 animated-mesh-bg">
         {/* Decorative Floating Blobs */}
         <div className="absolute top-10 left-1/4 w-72 h-72 bg-[var(--accent)]/10 rounded-full blur-3xl animate-float pointer-events-none" />
         <div className="absolute bottom-10 right-1/4 w-96 h-96 bg-[var(--accent2)]/10 rounded-full blur-3xl animate-float pointer-events-none" style={{ animationDelay: '2s' }} />
@@ -177,6 +177,23 @@ const Home = () => {
             )}
           </motion.div>
         </div>
+
+        {/* Scroll Down Indicator */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1, y: [0, 8, 0] }}
+          transition={{ delay: 1, duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex flex-col items-center cursor-pointer text-[var(--muted)] hover:text-[var(--accent)] transition-colors z-20"
+          onClick={() => {
+            const el = document.getElementById('roadmaps');
+            if (el) el.scrollIntoView({ behavior: 'smooth' });
+          }}
+        >
+          <span className="text-[10px] font-mono tracking-widest uppercase mb-1.5 opacity-80">Scroll Down</span>
+          <svg className="w-5 h-5 opacity-75" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M19 13l-7 7-7-7" />
+          </svg>
+        </motion.div>
       </section>
 
       {/* About Section */}
