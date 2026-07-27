@@ -301,12 +301,6 @@ npm run dev
 
 ---
 
-## 📜 License
-
-Distributed under the MIT License. See `LICENSE` for more information.
-
----
-
 <div align="center">
   <sub>Built with ❤️ by Divyam Samant for Computer Science Students & Engineers worldwide.</sub>
 </div>
