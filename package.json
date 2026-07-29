@@ -1,0 +1,21 @@
+{
+  "name": "my-your-our-cs-guide",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Comprehensive Computer Science Roadmap & Career Guide Platform",
+  "workspaces": [
+    "client",
+    "server"
+  ],
+  "scripts": {
+    "setup": "npm install && npm install --prefix client && npm install --prefix server",
+    "install:all": "npm install --prefix client && npm install --prefix server",
+    "dev": "concurrently \"npm run dev --prefix server\" \"npm run dev --prefix client\"",
+    "dev:client": "npm run dev --prefix client",
+    "dev:server": "npm run dev --prefix server",
+    "build": "npm run build --prefix client"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
