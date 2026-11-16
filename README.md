@@ -12,6 +12,7 @@
 
   <p align="center">
     <a href="#curated-roadmaps">Roadmaps</a> •
+    <a href="#project-demo--video-walkthrough">Video Demo</a> •
     <a href="#key-features">Features</a> •
     <a href="#tech-stack">Tech Stack</a> •
     <a href="#system-architecture--workflow">Architecture</a> •
@@ -35,6 +36,24 @@
 ## 🌟 Overview
 
 **MY/YOUR/OUR CS GUIDE** is a modern SaaS-style web platform built for disciplined Computer Science preparation, placement prep, and full-stack software development. It eliminates learning clutter by providing structured, interactive checklists, real-time velocity analytics, target deadline planners, custom topic additions, and hybrid cloud synchronization.
+
+---
+
+## 🎬 Project Demo & Video Walkthrough
+
+<div align="center">
+  <video src="https://github.com/SamantD7/My-Your-Our-CS-Guide/raw/main/CS_Guide_Project_Video_clip.mp4" controls="controls" muted="muted" width="100%" style="max-width: 850px; border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.3);">
+    <source src="CS_Guide_Project_Video_clip.mp4" type="video/mp4" />
+    Your browser does not support the video tag.
+  </video>
+
+  <p align="center">
+    <i>Watch the full platform walkthrough and feature demonstration.</i><br />
+    <a href="https://github.com/SamantD7/My-Your-Our-CS-Guide/blob/main/CS_Guide_Project_Video_clip.mp4">
+      <img src="https://img.shields.io/badge/▶%20Watch%20Player-CS__Guide__Project__Video__clip.mp4-6C47FF?style=for-the-badge&logo=youtube&logoColor=white" alt="Direct Video Player" />
+    </a>
+  </p>
+</div>
 
 ---
 
