@@ -41,18 +41,36 @@
 
 ## 🎬 Project Demo & Video Walkthrough
 
-<div align="center">
-  <video src="https://github.com/SamantD7/My-Your-Our-CS-Guide/raw/main/CS_Guide_Project_Video_clip.mp4" controls="controls" muted="muted" width="100%" style="max-width: 850px; border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.3);">
-    <source src="CS_Guide_Project_Video_clip.mp4" type="video/mp4" />
-    Your browser does not support the video tag.
-  </video>
+<p align="center">
+  <strong>Explore My/Your/Our CS Guide through a complete project walkthrough.</strong>
+  <br/>
+  A demonstration of the platform, its modules, features and functionality.
+</p>
 
-  <p align="center">
-    <i>Watch the full platform walkthrough and feature demonstration.</i><br />
-    <a href="https://github.com/SamantD7/My-Your-Our-CS-Guide/blob/main/CS_Guide_Project_Video_clip.mp4">
-      <img src="https://img.shields.io/badge/▶%20Watch%20Player-CS__Guide__Project__Video__clip.mp4-6C47FF?style=for-the-badge&logo=youtube&logoColor=white" alt="Direct Video Player" />
-    </a>
+<div align="center">
+
+  <p>
+    <i>Watch the complete platform walkthrough and feature demonstration.</i>
   </p>
+
+  <!-- GitHub Video Button -->
+  <a href="https://github.com/SamantD7/My-Your-Our-CS-Guide/blob/main/CS_Guide_Project_Video_clip.mp4">
+    <img src="https://img.shields.io/badge/▶_GitHub_Video_Player-6C47FF?style=for-the-badge&logo=github&logoColor=white" alt="GitHub Video"/>
+  </a>
+
+  &nbsp;
+
+  <!-- Google Drive Button -->
+  <a href="https://drive.google.com/file/d/1iDJxcDq1D-lVXSezJmcEua_1Aa0cFoRv/view?usp=drive_link">
+    <img src="https://img.shields.io/badge/▶_Watch_on_Google_Drive-4285F4?style=for-the-badge&logo=googledrive&logoColor=white" alt="Google Drive Video"/>
+  </a>
+
+  <br/><br/>
+
+  <sub>
+    If the GitHub video player doesn't load, use the Google Drive alternative.
+  </sub>
+
 </div>
 
 ---
